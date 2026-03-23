@@ -11,7 +11,7 @@ export interface MarbleInkProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const fragmentShader = `
-// Marble/ink in water effect — high fashion, editorial
+// Light liquid surface — inverted noir with subtle iridescence
 float hash(vec2 p) {
     return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
 }
@@ -20,19 +20,17 @@ float noise(vec2 p) {
     vec2 i = floor(p);
     vec2 f = fract(p);
     f = f * f * (3.0 - 2.0 * f);
-
     float a = hash(i);
     float b = hash(i + vec2(1.0, 0.0));
     float c = hash(i + vec2(0.0, 1.0));
     float d = hash(i + vec2(1.0, 1.0));
-
     return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
 }
 
 float fbm(vec2 p) {
     float val = 0.0;
     float amp = 0.5;
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 5; i++) {
         val += amp * noise(p);
         p *= 2.0;
         amp *= 0.5;
@@ -42,27 +40,29 @@ float fbm(vec2 p) {
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
-    float t = iTime * 0.15 * u_speed;
+    float t = iTime * 0.2 * u_speed;
 
-    // Warped domain for marble veins
-    vec2 q = vec2(fbm(uv * 3.0 + t * 0.3), fbm(uv * 3.0 + vec2(1.7, 9.2) + t * 0.2));
-    vec2 r = vec2(fbm(uv * 3.0 + q * 4.0 + vec2(8.3, 2.8) + t * 0.1),
-                  fbm(uv * 3.0 + q * 4.0 + vec2(5.1, 3.4) + t * 0.15));
+    // Liquid distortion
+    float n1 = fbm(uv * 4.0 + t * vec2(0.3, 0.1));
+    float n2 = fbm(uv * 3.0 + vec2(n1) * 2.0 + t * vec2(-0.1, 0.2));
+    float n3 = fbm(uv * 5.0 + vec2(n2, n1) + t * 0.15);
 
-    float f = fbm(uv * 3.0 + r * 2.0);
+    // Light palette — white surface with grey depth
+    vec3 bright = vec3(0.95, 0.95, 0.95);
+    vec3 mid = vec3(0.88, 0.88, 0.88);
+    vec3 shadow = vec3(0.78, 0.78, 0.78);
 
-    // Marble palette — grey stone with cool undertones
-    vec3 white = vec3(0.62, 0.60, 0.58);
-    vec3 vein = vec3(0.38, 0.36, 0.34);
-    vec3 warm = vec3(0.55, 0.52, 0.50);
+    vec3 col = mix(bright, mid, smoothstep(0.3, 0.6, n2));
+    col = mix(col, shadow, pow(smoothstep(0.5, 0.8, n3), 2.0) * u_contrast);
 
-    vec3 col = mix(white, warm, smoothstep(0.3, 0.7, f));
-    // Veins
-    float veinPattern = smoothstep(0.48, 0.52, f) * u_contrast;
-    col = mix(col, vein, veinPattern * 0.6);
+    // Iridescence — subtle warm/cool shift
+    float iridescence = sin(n2 * 12.0 + t) * 0.015;
+    col.r += iridescence;
+    col.b -= iridescence;
 
-    // Subtle depth
-    col *= 0.92 + 0.08 * f;
+    // Soft highlights
+    float spec = pow(max(0.0, n3 - 0.6) * 3.0, 3.0) * 0.12;
+    col += spec;
 
     fragColor = vec4(col, 1.0);
 }

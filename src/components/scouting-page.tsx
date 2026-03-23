@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { AnimatePresence, motion } from "framer-motion";
-import { Upload, X, Loader2, CheckCircle2, ArrowDown } from "lucide-react";
+import { Upload, X, Loader2, ArrowDown, Check } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const MarbleInk = dynamic(() => import("@/components/ui/marble-ink"), {
@@ -66,6 +66,7 @@ export function ScoutingPage() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<ApplicationData>({
     resolver: zodResolver(applicationSchema),
@@ -152,32 +153,6 @@ export function ScoutingPage() {
     }
   }
 
-  // ─── Success ────────────────────────────────────────────
-
-  if (submitted) {
-    return (
-      <div className="relative flex min-h-svh items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-background">
-          <MarbleInk speed={0.8} className="h-full w-full" />
-        </div>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="relative z-10 mx-auto max-w-md px-6 text-center"
-        >
-          <CheckCircle2 className="mx-auto mb-4 h-10 w-10 text-muted-foreground" />
-          <h2 className="font-heading text-3xl font-light italic">
-            Application received.
-          </h2>
-          <p className="mt-3 text-sm text-muted-foreground">
-            We&apos;ll review your photos and get back to you within a few
-            days if there&apos;s a match. Thank you.
-          </p>
-        </motion.div>
-      </div>
-    );
-  }
-
   // ─── Main layout ────────────────────────────────────────
 
   return (
@@ -191,46 +166,46 @@ export function ScoutingPage() {
 
         <div className="relative z-10 flex flex-1 flex-col justify-center px-8 py-16 sm:px-12 lg:px-20">
           {/* Logo */}
-          <p className="mb-12 font-playfair text-base uppercase tracking-[0.35em] text-white/70 lg:mb-14">
-            Scouting.Agency
+          <p className="mb-12 text-xs font-bold uppercase tracking-[0.25em] text-black/70 lg:mb-14">
+            scouting agency
           </p>
 
           {/* Headline */}
-          <h1 className="max-w-lg font-heading text-5xl font-light italic leading-[1.1] text-white sm:text-6xl lg:text-7xl">
+          <h1 className="max-w-lg text-3xl font-bold uppercase leading-[1.1] tracking-tight text-black sm:text-4xl lg:text-5xl">
             We&apos;re looking for
             <br />
             the next face.
           </h1>
-          <p className="mt-6 text-base leading-relaxed text-white/60">
+          <p className="mt-6 text-xs leading-relaxed text-black/55">
             We discover raw, striking, unforgettable girls
             <br />
             and place them with leading agencies worldwide.
           </p>
-          <p className="mt-3 text-sm text-white/40">
+          <p className="mt-3 text-xs text-black/35">
             Placements in Paris, New York, Milan, Tokyo &amp; more.
           </p>
 
           {/* Key requirements */}
           <div className="mt-12 flex gap-10 lg:mt-14">
             <div>
-              <p className="text-base font-medium tracking-wide text-white/90">14 – 35</p>
-              <p className="mt-1 text-[11px] uppercase tracking-widest text-white/45">Age</p>
+              <p className="text-xs font-medium text-black/85">14 – 35</p>
+              <p className="mt-1 text-xs font-medium uppercase tracking-[0.1em] text-black/40">Age</p>
             </div>
             <div>
-              <p className="text-base font-medium tracking-wide text-white/90">170 cm+</p>
-              <p className="mt-1 text-[11px] uppercase tracking-widest text-white/45">Height</p>
+              <p className="text-xs font-medium text-black/85">170 cm+</p>
+              <p className="mt-1 text-xs font-medium uppercase tracking-[0.1em] text-black/40">Height</p>
             </div>
             <div>
-              <p className="text-base font-medium tracking-wide text-white/90">New Faces</p>
-              <p className="mt-1 text-[11px] uppercase tracking-widest text-white/45">Experience</p>
+              <p className="text-xs font-medium text-black/85">New Faces</p>
+              <p className="mt-1 text-xs font-medium uppercase tracking-[0.1em] text-black/40">Experience</p>
             </div>
           </div>
         </div>
 
         {/* Mobile scroll indicator */}
         <div className="flex flex-col items-center pb-6 lg:hidden">
-          <a href="#apply" className="flex flex-col items-center gap-1 text-white/50">
-            <span className="text-[10px] uppercase tracking-widest">Apply</span>
+          <a href="#apply" className="flex flex-col items-center gap-1 text-black/40">
+            <span className="text-xs font-medium uppercase tracking-[0.1em]">Apply</span>
             <ArrowDown className="h-4 w-4 animate-bounce" />
           </a>
         </div>
@@ -240,6 +215,37 @@ export function ScoutingPage() {
       {/* ── Right: Form ── */}
       <div id="apply" className="lg:ml-[50%] lg:min-h-svh">
         <div className="flex lg:min-h-svh flex-col justify-center px-8 py-12 sm:px-12 lg:px-16">
+          {submitted ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mx-auto flex w-full max-w-md flex-col items-center"
+            >
+              <div className="mb-5 flex h-8 w-8 items-center justify-center border border-foreground">
+                <Check className="h-3.5 w-3.5 text-foreground" strokeWidth={2.5} />
+              </div>
+              <p className="text-xs font-medium uppercase tracking-[0.15em]">
+                Application received
+              </p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                We&apos;ll be in touch if there&apos;s a match.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSubmitted(false);
+                  setSubmitError("");
+                  setPhotoError("");
+                  setPhotos(PHOTO_SLOTS.map((s) => ({ ...s, file: null, preview: null, error: null })));
+                  reset();
+                }}
+                className="mt-6 text-xs text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+              >
+                Submit another
+              </button>
+            </motion.div>
+          ) : (
+          <>
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="mx-auto w-full max-w-md space-y-5"
@@ -247,10 +253,10 @@ export function ScoutingPage() {
           >
             {/* Photos */}
             <div>
-              <p className="mb-1.5 text-[11px] uppercase tracking-wider text-muted-foreground">
+              <p className="mb-1.5 text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">
                 Photos <span className="text-foreground/30">*</span>
               </p>
-              <p className="mb-2.5 text-[11px] text-muted-foreground">
+              <p className="mb-2.5 text-xs text-muted-foreground">
                 Natural light, no makeup, hair down, no filters.
               </p>
               <div className="grid grid-cols-3 gap-2.5">
@@ -292,14 +298,14 @@ export function ScoutingPage() {
                           }`}
                         >
                           <Upload className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                          <span className="text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">
                             {photo.label}
                           </span>
                         </motion.button>
                       )}
                     </AnimatePresence>
                     {photo.error && (
-                      <p className="mt-1 text-[10px] text-red-400">{photo.error}</p>
+                      <p className="mt-1 text-xs text-red-400">{photo.error}</p>
                     )}
                     <input
                       ref={(el) => { fileRefs.current[i] = el; }}
@@ -395,7 +401,7 @@ export function ScoutingPage() {
                 {...register("consent")}
                 className="mt-0.5 h-3.5 w-3.5 accent-foreground"
               />
-              <span className="text-[11px] leading-relaxed text-muted-foreground">
+              <span className="text-xs leading-relaxed text-muted-foreground">
                 I agree to the{" "}
                 <a href="/privacy" className="underline transition-colors hover:text-foreground">
                   Privacy Policy
@@ -408,7 +414,7 @@ export function ScoutingPage() {
               </span>
             </label>
             {errors.consent && (
-              <p className="text-[11px] text-red-400">{errors.consent.message}</p>
+              <p className="text-xs text-red-400">{errors.consent.message}</p>
             )}
 
             {/* Submit error */}
@@ -420,7 +426,7 @@ export function ScoutingPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-foreground py-2.5 text-xs uppercase tracking-widest text-background transition-colors hover:bg-foreground/90 disabled:opacity-50"
+              className="w-full bg-foreground py-2.5 text-xs font-medium uppercase tracking-[0.15em] text-background transition-colors hover:bg-foreground/90 disabled:opacity-50"
             >
               {isSubmitting ? (
                 <Loader2 className="mx-auto h-4 w-4 animate-spin" />
@@ -439,6 +445,9 @@ export function ScoutingPage() {
               <span>Built by <a href="https://budapestlabs.com" className="transition-colors hover:text-foreground">Budapest Labs</a></span>
             </p>
           </div>
+          </>
+          )}
+
         </div>
       </div>
     </div>
@@ -460,7 +469,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1 block text-[11px] uppercase tracking-wider text-muted-foreground">
+      <label className="mb-1 block text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">
         {label}
         {required && <span className="ml-0.5 text-foreground/30">*</span>}
       </label>
@@ -471,7 +480,7 @@ function Field({
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
-            className="mt-0.5 text-[11px] text-red-400"
+            className="mt-0.5 text-xs text-red-400"
           >
             {error}
           </motion.p>
@@ -484,7 +493,7 @@ function Field({
 // ─── Shared input class ───────────────────────────────────
 
 function fieldClass(error?: { message?: string }) {
-  return `w-full border-b bg-transparent py-1.5 text-sm outline-none transition-colors placeholder:text-muted-foreground/50 ${
+  return `w-full border-b bg-transparent py-1.5 text-xs outline-none transition-colors placeholder:text-muted-foreground/50 ${
     error
       ? "border-red-400/50 focus:border-red-400"
       : "border-border focus:border-foreground/30"

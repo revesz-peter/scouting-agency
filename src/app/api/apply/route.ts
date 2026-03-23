@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       const resend = new Resend(RESEND_API_KEY);
 
       await resend.emails.send({
-        from: "Scouting.Agency <noreply@scouting.agency>",
+        from: "scouting agency <noreply@scouting.agency>",
         to: NOTIFY_EMAIL,
         subject: `New Application: ${name}`,
         html: `

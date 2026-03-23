@@ -1,16 +1,25 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description:
+    "How scouting agency collects, uses, and protects your personal data.",
+  alternates: { canonical: "/privacy" },
+};
+
 export default function PrivacyPage() {
   return (
     <main className="mx-auto max-w-2xl px-6 py-24">
       <a
         href="/"
-        className="mb-8 inline-block text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
+        className="mb-8 inline-block text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:text-foreground"
       >
         &larr; Back
       </a>
-      <h1 className="mb-8 font-heading text-3xl font-light italic">Privacy Policy</h1>
-      <div className="space-y-6 text-sm leading-relaxed text-muted-foreground">
+      <h1 className="mb-8 text-xs font-bold uppercase tracking-[0.25em]">Privacy Policy</h1>
+      <div className="space-y-6 text-xs leading-relaxed text-muted-foreground">
         <section>
-          <h2 className="mb-2 font-medium text-foreground">What we collect</h2>
+          <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.1em] text-foreground">What we collect</h2>
           <p>When you submit an application, we collect:</p>
           <ul className="mt-2 list-inside list-disc space-y-1">
             <li>Name</li>
@@ -28,7 +37,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="mb-2 font-medium text-foreground">How we use it</h2>
+          <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.1em] text-foreground">How we use it</h2>
           <p>
             Your data is used exclusively to evaluate your scouting application and
             to connect you with modeling agencies. We will never sell, rent, or
@@ -38,7 +47,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="mb-2 font-medium text-foreground">Data sharing</h2>
+          <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.1em] text-foreground">Data sharing</h2>
           <p>
             We share your application data and photos only with vetted partner
             modeling agencies for the purpose of scouting evaluation. We do not
@@ -47,7 +56,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="mb-2 font-medium text-foreground">Data retention</h2>
+          <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.1em] text-foreground">Data retention</h2>
           <p>
             Application data is retained for up to 12 months after submission to
             allow ongoing scouting consideration. You may request early deletion at
@@ -56,7 +65,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="mb-2 font-medium text-foreground">Minors&apos; data</h2>
+          <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.1em] text-foreground">Minors&apos; data</h2>
           <p>
             We accept applications from individuals aged 14 and above. For
             applicants under 18, we require parental or guardian consent before
@@ -76,7 +85,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="mb-2 font-medium text-foreground">Your rights</h2>
+          <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.1em] text-foreground">Your rights</h2>
           <p>
             You have the right to access, correct, or delete your personal data at
             any time. To exercise these rights, contact us at the email below. We
@@ -85,7 +94,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="mb-2 font-medium text-foreground">Contact</h2>
+          <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.1em] text-foreground">Contact</h2>
           <p>
             For privacy-related questions or data requests, reach us at{" "}
             <a
