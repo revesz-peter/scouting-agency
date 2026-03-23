@@ -442,7 +442,7 @@ export function ScoutingPage() {
             <p className="flex items-center justify-center gap-2">
               <a href="mailto:hello@scouting.agency" className="transition-colors hover:text-foreground">hello@scouting.agency</a>
               <span>·</span>
-              <span>Built by <a href="https://budapestlabs.com" className="transition-colors hover:text-foreground">Budapest Labs</a></span>
+              <span>Built by <a href="https://budapestlabs.com" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">Budapest Labs</a></span>
             </p>
           </div>
           </>
