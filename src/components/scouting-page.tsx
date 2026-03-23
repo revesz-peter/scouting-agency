@@ -181,9 +181,18 @@ export function ScoutingPage() {
             <br />
             and place them with leading agencies worldwide.
           </p>
-          <p className="mt-3 text-xs text-black/35">
-            Placements in Paris, New York, Milan, Tokyo &amp; more.
-          </p>
+          <div className="mt-4 max-w-md space-y-4">
+            <p className="text-xs leading-relaxed text-black/40">
+              We work with international model management companies with
+              headquarters in Los Angeles and five additional offices across
+              Europe.
+            </p>
+            <p className="text-xs leading-relaxed text-black/40">
+              Our talents collaborate with leading fashion houses and
+              publications such as Prada, Louis Vuitton, Armani, Miu Miu,
+              Maison Margiela, Tiffany, Dazed, Vogue, and many more.
+            </p>
+          </div>
 
           {/* Key requirements */}
           <div className="mt-12 flex gap-10 lg:mt-14">
