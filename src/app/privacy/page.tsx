@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -10,12 +11,12 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <main className="mx-auto max-w-2xl px-6 py-24">
-      <a
+      <Link
         href="/"
         className="mb-8 inline-block text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:text-foreground"
       >
         &larr; Back
-      </a>
+      </Link>
       <h1 className="mb-8 text-xs font-bold uppercase tracking-[0.25em]">Privacy Policy</h1>
       <div className="space-y-6 text-xs leading-relaxed text-muted-foreground">
         <section>
@@ -77,9 +78,9 @@ export default function PrivacyPage() {
             Minors&apos; data is handled with additional care and is only shared
             with partner agencies after parental consent has been confirmed. See
             our{" "}
-            <a href="/terms" className="underline transition-colors hover:text-foreground">
+            <Link href="/terms" className="underline transition-colors hover:text-foreground">
               Terms of Service
-            </a>{" "}
+            </Link>{" "}
             for full consent requirements.
           </p>
         </section>
