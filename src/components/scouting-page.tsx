@@ -205,8 +205,8 @@ export function ScoutingPage() {
                     </p>
                     <div className="mt-4 max-w-md space-y-4">
                         <p className="text-xs leading-relaxed text-black/40">
-                            We work with international model management
-                            companies with headquarters in Los Angeles and five
+                            We work with an international model management
+                            company with headquarters in Los Angeles and five
                             additional offices across Europe.
                         </p>
                         <p className="text-xs leading-relaxed text-black/40">
