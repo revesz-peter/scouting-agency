@@ -38,7 +38,7 @@ export default function TermsPage() {
                         Eligibility
                     </h2>
                     <p>
-                        Applicants must be between 14 and 35 years of age. By
+                        Applicants must be at least 14 years of age. By
                         submitting an application, you confirm that all
                         information provided is accurate and that you have the
                         right to share the photos and personal data included.

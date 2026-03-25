@@ -6,12 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { AnimatePresence, motion } from "framer-motion"
 import { Upload, X, Loader2, ArrowDown, Check } from "lucide-react"
-import dynamic from "next/dynamic"
 import Link from "next/link"
-
-const MarbleInk = dynamic(() => import("@/components/ui/marble-ink"), {
-    ssr: false,
-})
 
 // ─── Schema ───────────────────────────────────────────────
 
@@ -37,7 +32,7 @@ const applicationSchema = z.object({
         .min(1, "Required")
         .refine((v) => /^\d+$/.test(v), "Enter a number")
         .refine((v) => Number(v) >= 14, "Minimum age is 14")
-        .refine((v) => Number(v) <= 35, "Maximum age is 35"),
+        .refine((v) => Number(v) <= 99, "Enter a valid age"),
     height: z
         .string()
         .min(1, "Required")
@@ -181,54 +176,53 @@ export function ScoutingPage() {
         <div className="relative min-h-svh lg:flex">
             {/* ── Left: Brand ── */}
             <div className="relative flex flex-col lg:w-1/2 lg:fixed lg:inset-y-0 lg:left-0">
-                {/* Shader background */}
-                <div className="absolute inset-0 bg-background">
-                    <MarbleInk speed={0.8} className="h-full w-full" />
-                </div>
+                {/* Background */}
+                <div className="absolute inset-0 bg-white" />
 
                 <div className="relative z-10 flex flex-1 flex-col justify-center px-8 py-16 sm:px-12 lg:px-20">
                     {/* Logo */}
-                    <p className="mb-12 text-xs font-bold uppercase tracking-[0.25em] text-black/70 lg:mb-14">
+                    <p className="mb-12 text-xs font-bold uppercase tracking-[0.25em] text-black/60 lg:mb-14">
                         scouting.
                     </p>
 
                     {/* Headline */}
-                    <h1 className="max-w-lg text-3xl font-bold uppercase leading-[1.1] tracking-tight text-black sm:text-4xl lg:text-5xl">
+                    <h1 className="max-w-lg text-3xl font-bold leading-[1.1] text-black sm:text-4xl lg:text-5xl font-[family-name:var(--font-libre)]">
                         We&apos;re looking for
                         <br />
                         the next face.
                     </h1>
-                    <p className="mt-6 text-xs leading-relaxed text-black/55">
-                        We discover raw, striking, unforgettable girls
-                        <br />
-                        and place them with leading agencies worldwide.
-                    </p>
-                    <div className="mt-4 max-w-md space-y-4">
+                    <div className="mt-8 max-w-md space-y-5">
+                        <p className="text-xs leading-relaxed text-black/60">
+                            We discover raw, striking, unforgettable girls
+                            and place them with leading agencies worldwide.
+                        </p>
+                        <p className="text-xs leading-relaxed text-black/40">
+                            Slim figure, natural beauty, striking bone
+                            structure. No experience needed — just a unique
+                            look and unedited photos.
+                        </p>
                         <p className="text-xs leading-relaxed text-black/40">
                             We work with an international model management
                             company with headquarters in Los Angeles and five
-                            additional offices across Europe.
-                        </p>
-                        <p className="text-xs leading-relaxed text-black/40">
-                            Our talents collaborate with leading fashion houses
-                            and publications such as Prada, Louis Vuitton,
-                            Armani, Miu Miu, Maison Margiela, Tiffany, Dazed,
-                            Vogue, and many more.
+                            additional offices across Europe. Our talents
+                            collaborate with houses such as Prada, Louis
+                            Vuitton, Armani, Miu Miu, Maison Margiela,
+                            Tiffany, Dazed, Vogue, and many more.
                         </p>
                     </div>
 
                     {/* Key requirements */}
                     <div className="mt-12 flex gap-10 lg:mt-14">
                         <div>
-                            <p className="text-xs font-medium text-black/85">
-                                14 – 35
+                            <p className="text-xs font-medium text-black/60">
+                                14+
                             </p>
                             <p className="mt-1 text-xs font-medium uppercase tracking-[0.1em] text-black/40">
                                 Age
                             </p>
                         </div>
                         <div>
-                            <p className="text-xs font-medium text-black/85">
+                            <p className="text-xs font-medium text-black/60">
                                 170 cm+
                             </p>
                             <p className="mt-1 text-xs font-medium uppercase tracking-[0.1em] text-black/40">
@@ -236,7 +230,7 @@ export function ScoutingPage() {
                             </p>
                         </div>
                         <div>
-                            <p className="text-xs font-medium text-black/85">
+                            <p className="text-xs font-medium text-black/60">
                                 New Faces
                             </p>
                             <p className="mt-1 text-xs font-medium uppercase tracking-[0.1em] text-black/40">
@@ -262,7 +256,7 @@ export function ScoutingPage() {
 
             {/* ── Right: Form ── */}
             <div id="apply" className="lg:ml-[50%] lg:min-h-svh">
-                <div className="flex lg:min-h-svh flex-col justify-center px-8 py-12 sm:px-12 lg:px-16">
+                <div className="flex lg:min-h-svh flex-col justify-center px-8 py-8 sm:px-12 lg:px-16 lg:py-6">
                     {submitted ? (
                         <motion.div
                             initial={{ opacity: 0 }}
@@ -306,7 +300,7 @@ export function ScoutingPage() {
                         <>
                             <form
                                 onSubmit={handleSubmit(onSubmit)}
-                                className="mx-auto w-full max-w-md space-y-5"
+                                className="mx-auto w-full max-w-md space-y-4"
                                 noValidate
                             >
                                 {/* Photos */}
@@ -337,7 +331,7 @@ export function ScoutingPage() {
                                                             exit={{
                                                                 opacity: 0,
                                                             }}
-                                                            className="group relative aspect-[3/4] overflow-hidden border border-border"
+                                                            className="group relative aspect-4/5 overflow-hidden border border-border"
                                                         >
                                                             <img
                                                                 src={
@@ -379,7 +373,7 @@ export function ScoutingPage() {
                                                                     i
                                                                 ]?.click()
                                                             }
-                                                            className={`flex aspect-[3/4] w-full flex-col items-center justify-center gap-2 border border-dashed transition-colors hover:border-foreground/30 ${
+                                                            className={`flex aspect-4/5 w-full flex-col items-center justify-center gap-2 border border-dashed transition-colors hover:border-foreground/30 ${
                                                                 photo.error
                                                                     ? "border-red-400/50"
                                                                     : "border-border"
