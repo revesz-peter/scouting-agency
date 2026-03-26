@@ -177,12 +177,12 @@ export function ScoutingPage() {
     return (
         <div className="relative min-h-svh lg:flex">
             {/* ── Left: Brand ── */}
-            <div className="relative flex flex-col lg:w-1/2 lg:fixed lg:inset-y-0 lg:left-0">
+            <div className="relative flex min-h-svh flex-col lg:w-1/2 lg:fixed lg:inset-y-0 lg:left-0">
                 {/* Background */}
                 <div className="absolute inset-0 bg-white" />
 
                 {/* Content */}
-                <div className="relative z-10 flex flex-1 flex-col justify-between py-10 lg:py-14">
+                <div className="relative z-10 flex flex-1 flex-col justify-center gap-10 py-10 lg:justify-between lg:py-14">
                     {/* Top: Logo */}
                     <div className="px-8 sm:px-12 lg:px-16">
                         <p className="text-xs font-bold uppercase tracking-[0.25em] text-black/60">
@@ -254,7 +254,7 @@ export function ScoutingPage() {
                 </div>
 
                 {/* Mobile scroll indicator */}
-                <div className="absolute bottom-4 left-0 right-0 z-10 flex flex-col items-center lg:hidden">
+                <div className="relative z-10 flex flex-col items-center pb-6 lg:hidden">
                     <a
                         href="#apply"
                         className="flex flex-col items-center gap-1 text-black/40"

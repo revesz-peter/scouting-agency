@@ -20,7 +20,7 @@ export function RunwaySlideshow() {
                 {strip.map((label, i) => (
                     <div
                         key={i}
-                        className="relative flex h-44 w-28 flex-none items-end overflow-hidden bg-black/[0.03] p-2.5 lg:h-52 lg:w-32"
+                        className="relative flex h-44 w-28 flex-none items-end overflow-hidden bg-black/[0.03] p-2.5 sm:h-48 sm:w-32 lg:h-52 lg:w-36"
                     >
                         <span className="text-[10px] font-light tracking-wide text-black/30">
                             {label}
