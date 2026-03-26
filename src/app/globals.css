@@ -59,3 +59,12 @@
 ::selection {
     background: rgba(0, 0, 0, 0.08);
 }
+
+@keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+    animation: marquee 25s linear infinite;
+}

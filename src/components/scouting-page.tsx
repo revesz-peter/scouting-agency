@@ -7,6 +7,8 @@ import { z } from "zod"
 import { AnimatePresence, motion } from "framer-motion"
 import { Upload, X, Loader2, ArrowDown, Check } from "lucide-react"
 import Link from "next/link"
+import { RunwaySlideshow } from "@/components/runway-slideshow"
+
 
 // ─── Schema ───────────────────────────────────────────────
 
@@ -179,69 +181,80 @@ export function ScoutingPage() {
                 {/* Background */}
                 <div className="absolute inset-0 bg-white" />
 
-                <div className="relative z-10 flex flex-1 flex-col justify-center px-8 py-16 sm:px-12 lg:px-20">
-                    {/* Logo */}
-                    <p className="mb-12 text-xs font-bold uppercase tracking-[0.25em] text-black/60 lg:mb-14">
-                        scouting.
-                    </p>
-
-                    {/* Headline */}
-                    <h1 className="max-w-lg text-3xl font-bold leading-[1.1] text-black sm:text-4xl lg:text-5xl font-[family-name:var(--font-libre)]">
-                        We&apos;re looking for
-                        <br />
-                        the next face.
-                    </h1>
-                    <div className="mt-8 max-w-md space-y-5">
-                        <p className="text-xs leading-relaxed text-black/60">
-                            We discover raw, striking, unforgettable girls
-                            and place them with leading agencies worldwide.
-                        </p>
-                        <p className="text-xs leading-relaxed text-black/40">
-                            Slim figure, natural beauty, striking bone
-                            structure. No experience needed — just a unique
-                            look and unedited photos.
-                        </p>
-                        <p className="text-xs leading-relaxed text-black/40">
-                            We work with an international model management
-                            company with headquarters in Los Angeles and five
-                            additional offices across Europe. Our talents
-                            collaborate with houses such as Prada, Louis
-                            Vuitton, Armani, Miu Miu, Maison Margiela,
-                            Tiffany, Dazed, Vogue, and many more.
+                {/* Content */}
+                <div className="relative z-10 flex flex-1 flex-col justify-between py-10 lg:py-14">
+                    {/* Top: Logo */}
+                    <div className="px-8 sm:px-12 lg:px-16">
+                        <p className="text-xs font-bold uppercase tracking-[0.25em] text-black/60">
+                            scouting.
                         </p>
                     </div>
 
-                    {/* Key requirements */}
-                    <div className="mt-12 flex gap-10 lg:mt-14">
-                        <div>
-                            <p className="text-xs font-medium text-black/60">
-                                14+
+                    {/* Middle: Copy */}
+                    <div className="px-8 sm:px-12 lg:px-16">
+                        <h1 className="max-w-lg text-3xl font-bold leading-[1.1] text-black sm:text-4xl lg:text-5xl font-[family-name:var(--font-libre)]">
+                            We&apos;re looking for
+                            <br />
+                            the next face.
+                        </h1>
+                        <div className="mt-6 max-w-md space-y-4">
+                            <p className="text-xs leading-relaxed text-black/60">
+                                We discover raw, striking, unforgettable girls
+                                and place them with leading agencies worldwide.
                             </p>
-                            <p className="mt-1 text-xs font-medium uppercase tracking-[0.1em] text-black/40">
-                                Age
+                            <p className="text-xs leading-relaxed text-black/40">
+                                Slim figure, natural beauty, striking bone
+                                structure. No experience needed — just a unique
+                                look and unedited photos.
+                            </p>
+                            <p className="text-xs leading-relaxed text-black/40">
+                                We work with an international model management
+                                company with headquarters in Los Angeles and
+                                five additional offices across Europe. Our
+                                talents collaborate with houses such as Prada,
+                                Louis Vuitton, Armani, Miu Miu, Maison
+                                Margiela, Tiffany, Dazed, Vogue, and many
+                                more.
                             </p>
                         </div>
-                        <div>
-                            <p className="text-xs font-medium text-black/60">
-                                170 cm+
-                            </p>
-                            <p className="mt-1 text-xs font-medium uppercase tracking-[0.1em] text-black/40">
-                                Height
-                            </p>
+
+                        {/* Key requirements */}
+                        <div className="mt-8 flex gap-10">
+                            <div>
+                                <p className="text-xs font-medium text-black/60">
+                                    14+
+                                </p>
+                                <p className="mt-1 text-xs font-medium uppercase tracking-[0.1em] text-black/40">
+                                    Age
+                                </p>
+                            </div>
+                            <div>
+                                <p className="text-xs font-medium text-black/60">
+                                    170 cm+
+                                </p>
+                                <p className="mt-1 text-xs font-medium uppercase tracking-[0.1em] text-black/40">
+                                    Height
+                                </p>
+                            </div>
+                            <div>
+                                <p className="text-xs font-medium text-black/60">
+                                    New Faces
+                                </p>
+                                <p className="mt-1 text-xs font-medium uppercase tracking-[0.1em] text-black/40">
+                                    Experience
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <p className="text-xs font-medium text-black/60">
-                                New Faces
-                            </p>
-                            <p className="mt-1 text-xs font-medium uppercase tracking-[0.1em] text-black/40">
-                                Experience
-                            </p>
-                        </div>
+                    </div>
+
+                    {/* Bottom: Runway strip */}
+                    <div>
+                        <RunwaySlideshow />
                     </div>
                 </div>
 
                 {/* Mobile scroll indicator */}
-                <div className="flex flex-col items-center pb-6 lg:hidden">
+                <div className="absolute bottom-4 left-0 right-0 z-10 flex flex-col items-center lg:hidden">
                     <a
                         href="#apply"
                         className="flex flex-col items-center gap-1 text-black/40"
