@@ -182,7 +182,7 @@ export function ScoutingPage() {
                 <div className="absolute inset-0 bg-white" />
 
                 {/* Content */}
-                <div className="relative z-10 flex flex-1 flex-col justify-center gap-10 py-10 lg:justify-between lg:py-14">
+                <div className="relative z-10 flex flex-1 flex-col justify-center gap-8 py-8 sm:gap-10 sm:py-10 lg:justify-between lg:py-14">
                     {/* Top: Logo */}
                     <div className="px-8 sm:px-12 lg:px-16">
                         <p className="text-xs font-bold uppercase tracking-[0.25em] text-black/60">
@@ -247,23 +247,21 @@ export function ScoutingPage() {
                         </div>
                     </div>
 
-                    {/* Bottom: Runway strip */}
-                    <div>
+                    {/* Bottom: Runway strip + scroll indicator */}
+                    <div className="space-y-6">
                         <RunwaySlideshow />
+                        <div className="flex flex-col items-center lg:hidden">
+                            <a
+                                href="#apply"
+                                className="flex flex-col items-center gap-1 text-black/40"
+                            >
+                                <span className="text-xs font-medium uppercase tracking-[0.1em]">
+                                    Apply
+                                </span>
+                                <ArrowDown className="h-4 w-4 animate-bounce" />
+                            </a>
+                        </div>
                     </div>
-                </div>
-
-                {/* Mobile scroll indicator */}
-                <div className="relative z-10 flex flex-col items-center pb-6 lg:hidden">
-                    <a
-                        href="#apply"
-                        className="flex flex-col items-center gap-1 text-black/40"
-                    >
-                        <span className="text-xs font-medium uppercase tracking-[0.1em]">
-                            Apply
-                        </span>
-                        <ArrowDown className="h-4 w-4 animate-bounce" />
-                    </a>
                 </div>
             </div>
 
