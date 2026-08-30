@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "How scouting agency collects, uses, and protects your personal data.",
+    "How scouting collects, uses, and protects personal data submitted through the platform.",
   alternates: { canonical: "/privacy" },
 };
 
@@ -19,6 +19,16 @@ export default function PrivacyPage() {
       </Link>
       <h1 className="mb-8 text-xs font-bold uppercase tracking-[0.25em]">Privacy Policy</h1>
       <div className="space-y-6 text-xs leading-relaxed text-muted-foreground">
+        <section>
+          <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.1em] text-foreground">Who we are</h2>
+          <p>
+            scouting is software that model agencies use to run their talent
+            pipeline. When you submit an application, the agency running that
+            pipeline decides on it; we process your data on that agency&apos;s
+            behalf and to operate the platform.
+          </p>
+        </section>
+
         <section>
           <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.1em] text-foreground">What we collect</h2>
           <p>When you submit an application, we collect:</p>
@@ -40,19 +50,21 @@ export default function PrivacyPage() {
         <section>
           <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.1em] text-foreground">How we use it</h2>
           <p>
-            Your data is used exclusively to evaluate your scouting application and
-            to connect you with modeling agencies. We will never sell, rent, or
-            share your information for advertising, marketing, or any purpose
-            unrelated to talent scouting.
+            Your data is used exclusively so that the agency you applied to can
+            review and decide on your application, and so we can operate the
+            platform that carries it. We will never sell, rent, or share your
+            information for advertising, marketing, or any purpose unrelated to
+            that application.
           </p>
         </section>
 
         <section>
           <h2 className="mb-2 text-xs font-medium uppercase tracking-[0.1em] text-foreground">Data sharing</h2>
           <p>
-            We share your application data and photos only with vetted partner
-            modeling agencies for the purpose of scouting evaluation. We do not
-            share data with any other third parties.
+            Your application data and photos are visible to the agency whose
+            pipeline you applied to, and to the service providers we use to
+            deliver and store it. We do not share your data with any other third
+            parties.
           </p>
         </section>
 
@@ -75,8 +87,8 @@ export default function PrivacyPage() {
             purpose of verifying consent.
           </p>
           <p className="mt-2">
-            Minors&apos; data is handled with additional care and is only shared
-            with partner agencies after parental consent has been confirmed. See
+            Minors&apos; data is handled with additional care and is only made
+            available to the agency after parental consent has been confirmed. See
             our{" "}
             <Link href="/terms" className="underline transition-colors hover:text-foreground">
               Terms of Service
@@ -99,12 +111,13 @@ export default function PrivacyPage() {
           <p>
             For privacy-related questions or data requests, reach us at{" "}
             <a
-              href="mailto:hello@scouting.agency"
+              href="mailto:privacy@scouting.agency"
               className="underline transition-colors hover:text-foreground"
             >
-              hello@scouting.agency
+              privacy@scouting.agency
             </a>
-            .
+            . If your request concerns a specific application, you may also
+            contact the agency you applied to directly.
           </p>
         </section>
       </div>

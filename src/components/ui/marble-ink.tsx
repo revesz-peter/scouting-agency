@@ -71,7 +71,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 export const MarbleInk = forwardRef<HTMLDivElement, MarbleInkProps>(
   ({ className, speed = 1.0, contrast = 1.0, ...props }, ref) => {
     return (
-      <div className={cn("w-full h-full", className)} ref={ref} {...(props as any)}>
+      <div className={cn("w-full h-full", className)} ref={ref} {...props}>
         <ShaderCanvas
           fs={fragmentShader}
           uniforms={{ u_speed: speed, u_contrast: contrast }}

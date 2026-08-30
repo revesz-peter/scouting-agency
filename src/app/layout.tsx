@@ -15,28 +15,29 @@ const libre = Libre_Baskerville({
     variable: "--font-libre",
 })
 
+const TITLE = "scouting — the progressive infrastructure behind model agencies."
+const DESCRIPTION =
+    "One system for the whole new-faces pipeline — from the first application to a signed face on the board."
+
 export const metadata: Metadata = {
     metadataBase: new URL("https://scouting.agency"),
     title: {
-        default: "scouting agency — we're looking for the next face.",
-        template: "%s | scouting agency",
+        default: TITLE,
+        template: "%s | scouting",
     },
-    description:
-        "Submit your application to be scouted for top modeling agencies worldwide. Girls aged 14+, no experience needed.",
+    description: DESCRIPTION,
     alternates: { canonical: "/" },
     openGraph: {
-        title: "scouting agency — we're looking for the next face.",
-        description:
-            "Submit your application to be scouted for top modeling agencies worldwide. Girls aged 14+, no experience needed.",
+        title: TITLE,
+        description: DESCRIPTION,
         type: "website",
         url: "https://scouting.agency",
-        siteName: "scouting agency",
+        siteName: "scouting",
     },
     twitter: {
         card: "summary_large_image",
-        title: "scouting agency — we're looking for the next face.",
-        description:
-            "Submit your application to be scouted for top modeling agencies worldwide. Girls aged 14+, no experience needed.",
+        title: TITLE,
+        description: DESCRIPTION,
     },
 }
 

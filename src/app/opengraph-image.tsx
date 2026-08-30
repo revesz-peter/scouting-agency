@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "scouting agency — we're looking for the next face.";
+export const alt =
+  "scouting — the progressive infrastructure behind model agencies.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -28,18 +29,18 @@ export default function Image() {
             marginBottom: "32px",
           }}
         >
-          scouting agency
+          scouting
         </div>
         <div
           style={{
-            fontSize: 64,
+            fontSize: 58,
             color: "#ffffff",
             fontStyle: "italic",
             textAlign: "center",
             lineHeight: 1.2,
           }}
         >
-          We&apos;re looking for the next face.
+          The progressive infrastructure behind model agencies.
         </div>
         <div
           style={{
@@ -49,7 +50,7 @@ export default function Image() {
             letterSpacing: "0.1em",
           }}
         >
-          Paris · New York · Milan · Tokyo
+          Applied · Pre-Select · Scheduled · Voting · Onboarding · On the Board
         </div>
       </div>
     ),
