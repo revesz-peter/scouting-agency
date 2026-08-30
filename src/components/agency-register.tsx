@@ -118,7 +118,7 @@ export function AgencyRegisterForm() {
 
     if (submitted) {
         return (
-            <div className="flex items-center px-6 py-14 sm:px-10 sm:py-20 lg:px-14">
+            <div className="order-1 flex items-center px-6 py-14 sm:px-10 sm:py-20 lg:order-2 lg:px-14">
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -149,7 +149,7 @@ export function AgencyRegisterForm() {
     }
 
     return (
-        <div className="px-6 py-14 sm:px-10 sm:py-20 lg:px-14">
+        <div className="order-1 px-6 py-14 sm:px-10 sm:py-20 lg:order-2 lg:px-14">
             <div className="mx-auto w-full max-w-sm lg:ml-0 lg:mr-auto">
                 <p className="text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
                     Agency

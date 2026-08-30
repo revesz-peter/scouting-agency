@@ -14,14 +14,8 @@ export default function SignIn() {
     return (
         <div className="flex min-h-svh flex-col">
             <SiteHeader />
-            <main className="flex-1 lg:grid lg:grid-cols-2">
-                <AgencyPanel
-                    cta={{
-                        text: "Not on the platform yet?",
-                        linkText: "Request an account",
-                        href: "/agency/register",
-                    }}
-                />
+            <main className="grid flex-1 lg:grid-cols-2">
+                <AgencyPanel />
                 <AgencySignInForm />
             </main>
             <SiteFooter />

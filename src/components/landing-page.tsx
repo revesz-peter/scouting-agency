@@ -197,13 +197,17 @@ export function LandingPage() {
                                 </span>
                             </p>
                             <p className="mt-4 text-lg text-foreground font-[family-name:var(--font-libre)]">
-                                First month free.
+                                Locked for founding agencies.
                             </p>
                             <p className="mt-6 max-w-sm text-xs leading-relaxed text-muted-foreground">
                                 One price for the agency — not per seat, not per
                                 application, not a cut of what you sign. No
-                                setup fee, no card to start, and you can leave
-                                whenever, taking your board with you.
+                                setup fee, and you can leave whenever, taking
+                                your board with you.
+                            </p>
+                            <p className="mt-3 max-w-sm text-xs leading-relaxed text-muted-foreground">
+                                The first five agencies keep €50 for good,
+                                whatever the price becomes later.
                             </p>
 
                             <Link

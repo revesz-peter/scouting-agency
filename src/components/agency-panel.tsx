@@ -1,4 +1,3 @@
-import Link from "next/link"
 import { STAGES } from "@/lib/pipeline"
 
 const HIGHLIGHTS = [
@@ -10,13 +9,9 @@ const HIGHLIGHTS = [
 ]
 
 /** Shared information column beside the agency sign-in and registration forms. */
-export function AgencyPanel({
-    cta,
-}: {
-    cta: { text: string; linkText: string; href: string }
-}) {
+export function AgencyPanel() {
     return (
-        <div className="border-b border-border bg-black/[0.015] px-6 py-16 sm:px-10 sm:py-20 lg:border-b-0 lg:border-r lg:px-14">
+        <div className="order-2 border-t border-border bg-black/[0.015] px-6 py-16 sm:px-10 sm:py-20 lg:order-1 lg:border-t-0 lg:border-r lg:px-14">
             <div className="lg:ml-auto lg:w-full lg:max-w-md">
                 <p className="text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
                     For agencies
@@ -69,24 +64,14 @@ export function AgencyPanel({
                     ))}
                 </ul>
 
-                {/* Price + cross-link */}
+                {/* Price */}
                 <div className="mt-8 border-t border-border pt-6">
                     <p className="text-sm text-foreground font-[family-name:var(--font-libre)]">
-                        €50 / month. First month free.
+                        €50 / month
                     </p>
                     <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                        Per agency, everything included. No setup fee, no card
-                        to start.
-                    </p>
-                    <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-                        {cta.text}{" "}
-                        <Link
-                            href={cta.href}
-                            className="underline underline-offset-4 transition-colors hover:text-foreground"
-                        >
-                            {cta.linkText}
-                        </Link>
-                        .
+                        Per agency, everything included. No setup fee. The first
+                        five agencies keep this price for good.
                     </p>
                 </div>
             </div>

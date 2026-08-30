@@ -8,7 +8,7 @@ export function AgencySignInForm() {
     const [notice, setNotice] = useState(false)
 
     return (
-        <div className="flex items-center px-6 py-14 sm:px-10 sm:py-20 lg:px-14">
+        <div className="order-1 flex items-center px-6 py-14 sm:px-10 sm:py-20 lg:order-2 lg:px-14">
             <div className="mx-auto w-full max-w-sm lg:ml-0 lg:mr-auto">
                 <p className="text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
                     Agency
@@ -55,16 +55,20 @@ export function AgencySignInForm() {
                         role="status"
                         className="mt-4 text-xs leading-relaxed text-muted-foreground"
                     >
-                        Access is invite-only while we onboard partner agencies.{" "}
-                        <Link
-                            href="/agency/register"
-                            className="underline underline-offset-4 transition-colors hover:text-foreground"
-                        >
-                            Request an account
-                        </Link>
-                        .
+                        Access is invite-only while we onboard partner agencies.
                     </p>
                 )}
+
+                <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
+                    Not on the platform yet?{" "}
+                    <Link
+                        href="/agency/register"
+                        className="underline underline-offset-4 transition-colors hover:text-foreground"
+                    >
+                        Request an account
+                    </Link>
+                    .
+                </p>
 
                 <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
                     Scouts sign in here too — your workspace and personal link

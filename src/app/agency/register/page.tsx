@@ -15,14 +15,8 @@ export default function Register() {
     return (
         <div className="flex min-h-svh flex-col">
             <SiteHeader />
-            <main className="flex-1 lg:grid lg:grid-cols-2">
-                <AgencyPanel
-                    cta={{
-                        text: "Already have an account?",
-                        linkText: "Sign in",
-                        href: "/agency/sign-in",
-                    }}
-                />
+            <main className="grid flex-1 lg:grid-cols-2">
+                <AgencyPanel />
                 <AgencyRegisterForm />
             </main>
             <SiteFooter />
