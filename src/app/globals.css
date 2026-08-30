@@ -65,6 +65,19 @@
     to { transform: translateX(-50%); }
 }
 
+/*
+ * The strip travels 50% of its own width, which is set by the tile size —
+ * so a fixed duration means smaller tiles scroll at fewer pixels per second.
+ * Shorten the duration as the tiles shrink to hold the speed roughly even.
+ */
 .animate-marquee {
-    animation: marquee 25s linear infinite;
+    animation: marquee 20s linear infinite;
+}
+
+@media (min-width: 640px) {
+    .animate-marquee { animation-duration: 22s; }
+}
+
+@media (min-width: 1024px) {
+    .animate-marquee { animation-duration: 25s; }
 }
