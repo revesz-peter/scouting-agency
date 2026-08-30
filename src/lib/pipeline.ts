@@ -21,7 +21,8 @@ export const STAGES: Stage[] = [
     {
         number: "03",
         name: "Scheduled",
-        description: "Shortlisted talent is booked for a meeting or digitals.",
+        description:
+            "Hold a casting or book a meeting — invitations, confirmations, and who actually showed.",
     },
     {
         number: "04",

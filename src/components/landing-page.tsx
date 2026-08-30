@@ -4,6 +4,10 @@ import { RunwaySlideshow } from "@/components/runway-slideshow"
 
 const CAPABILITIES = [
     {
+        label: "Castings, held here",
+        body: "Open a casting, invite from your shortlist, and see who confirmed and who actually turned up. Notes from the room land on the applicant, so the vote afterwards has something behind it.",
+    },
+    {
         label: "Your board, exportable",
         body: "The signed roster in one place — and it leaves when you want it to. A talent's package as a PDF, the whole board as a CSV.",
     },
@@ -46,9 +50,9 @@ export function LandingPage() {
                     The progressive infrastructure behind model agencies.
                 </h1>
                 <p className="mt-7 max-w-lg text-xs leading-relaxed text-muted-foreground">
-                    One system for the whole new-faces pipeline — from the first
-                    application to a signed face on the board. Built for the
-                    people who run the agency, not around them.
+                    From open call to on the board. Run applications, castings,
+                    board votes, and your roster in one system — instead of an
+                    inbox, a spreadsheet, and a group chat.
                 </p>
 
                 <div className="mt-9 flex flex-wrap items-center gap-6">
@@ -82,7 +86,7 @@ export function LandingPage() {
                 <h2 className="mt-4 max-w-xl text-2xl leading-[1.15] text-foreground sm:text-3xl font-[family-name:var(--font-libre)]">
                     Scouting is a process. Run it like one.
                 </h2>
-                <div className="mt-12 grid gap-10 sm:grid-cols-2 sm:gap-8 lg:grid-cols-4">
+                <div className="mt-12 grid gap-10 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
                     {CAPABILITIES.map((item) => (
                         <div key={item.label} className="border-t border-border pt-5">
                             <p className="text-xs font-medium uppercase tracking-[0.1em] text-foreground">
@@ -191,23 +195,20 @@ export function LandingPage() {
                         {/* Price */}
                         <div>
                             <p className="text-4xl leading-none text-foreground sm:text-5xl font-[family-name:var(--font-libre)]">
-                                €50
+                                €199
                                 <span className="ml-2 text-2xl text-muted-foreground sm:text-3xl">
                                     / month
                                 </span>
                             </p>
                             <p className="mt-4 text-lg text-foreground font-[family-name:var(--font-libre)]">
-                                Locked for founding agencies.
+                                Your first month is free.
                             </p>
                             <p className="mt-6 max-w-sm text-xs leading-relaxed text-muted-foreground">
-                                One price for the agency — not per seat, not per
-                                application, not a cut of what you sign. No
-                                setup fee, and you can leave whenever, taking
-                                your board with you.
-                            </p>
-                            <p className="mt-3 max-w-sm text-xs leading-relaxed text-muted-foreground">
-                                The first five agencies keep €50 for good,
-                                whatever the price becomes later.
+                                We set you up, your link goes live, and you pay
+                                nothing until applications are actually landing.
+                                One price for the agency after that — not per
+                                seat, not per application, not a cut of what you
+                                sign.
                             </p>
 
                             <Link
