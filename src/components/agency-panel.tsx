@@ -67,7 +67,7 @@ export function AgencyPanel() {
                 {/* Price */}
                 <div className="mt-8 border-t border-border pt-6">
                     <p className="text-sm text-foreground font-[family-name:var(--font-libre)]">
-                        €199 / month
+                        €150 / month
                     </p>
                     <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
                         First month free while we set you up. Per agency,

@@ -195,7 +195,7 @@ export function LandingPage() {
                         {/* Price */}
                         <div>
                             <p className="text-4xl leading-none text-foreground sm:text-5xl font-[family-name:var(--font-libre)]">
-                                €199
+                                €150
                                 <span className="ml-2 text-2xl text-muted-foreground sm:text-3xl">
                                     / month
                                 </span>
