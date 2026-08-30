@@ -27,6 +27,7 @@ export const metadata: Metadata = {
     },
     description: DESCRIPTION,
     alternates: { canonical: "/" },
+    icons: { icon: "/favicon.svg" },
     openGraph: {
         title: TITLE,
         description: DESCRIPTION,
