@@ -29,10 +29,6 @@ const FIELDS = [
   "videoLink",
   "portfolioLink",
   "notes",
-  "guardianName",
-  "guardianRelation",
-  "guardianEmail",
-  "guardianPhone",
 ] as const;
 
 type FieldName = (typeof FIELDS)[number];
@@ -150,20 +146,6 @@ export async function POST(request: Request) {
                 </tr>` : ""}
               </table>
             </div>
-
-            ${values.guardianName || values.guardianEmail || values.guardianPhone ? `
-            <div style="padding:24px 0;border-bottom:1px solid #e5e5e5;">
-              <p style="margin:0 0 8px;font-size:10px;text-transform:uppercase;letter-spacing:0.2em;color:#999;">Parent or guardian${age !== null && age < 18 ? " — consent required before sharing" : ""}</p>
-              <table style="border-collapse:collapse;width:100%;font-size:13px;">
-                ${row("Name", [values.guardianName, values.guardianRelation].filter(Boolean).join(" · "))}
-                ${values.guardianEmail ? `<tr>
-                  <td style="padding:6px 0;color:#999;width:130px;">Email</td>
-                  <td style="padding:6px 0;"><a href="mailto:${escapeHtml(values.guardianEmail)}" style="color:#000;">${escapeHtml(values.guardianEmail)}</a></td>
-                </tr>` : ""}
-                ${row("Phone", values.guardianPhone)}
-              </table>
-            </div>
-            ` : ""}
 
             <div style="padding:24px 0;border-bottom:1px solid #e5e5e5;">
               <p style="margin:0 0 8px;font-size:10px;text-transform:uppercase;letter-spacing:0.2em;color:#999;">Measurements</p>

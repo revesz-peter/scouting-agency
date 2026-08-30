@@ -66,7 +66,7 @@ const optionalUrl = z
         "Enter a full link starting with http",
     )
 
-const baseSchema = z.object({
+const applicationSchema = z.object({
     // 01 Personal
     firstName: z.string().trim().min(1, "Required"),
     lastName: z.string().trim().min(1, "Required"),
@@ -101,40 +101,7 @@ const baseSchema = z.object({
     portfolioLink: optionalUrl,
     notes: z.string().trim().max(2000, "Keep it under 2000 characters").optional(),
 
-    // Required only for applicants under 18 — see the refinement below
-    guardianName: z.string().trim().optional(),
-    guardianRelation: z.string().trim().optional(),
-    guardianEmail: z.string().trim().optional(),
-    guardianPhone: z.string().trim().optional(),
-
     consent: z.literal(true, { error: "You must agree to continue" }),
-})
-
-const MINOR_REQUIRED = [
-    "guardianName",
-    "guardianEmail",
-    "guardianPhone",
-] as const
-
-const applicationSchema = baseSchema.superRefine((data, ctx) => {
-    if (!data.dob || Number.isNaN(Date.parse(data.dob))) return
-    if (ageFrom(data.dob) >= 18) return
-
-    for (const field of MINOR_REQUIRED) {
-        if (!data[field]) {
-            ctx.addIssue({ code: "custom", message: "Required", path: [field] })
-        }
-    }
-    if (
-        data.guardianEmail &&
-        !z.string().email().safeParse(data.guardianEmail).success
-    ) {
-        ctx.addIssue({
-            code: "custom",
-            message: "Enter a valid email",
-            path: ["guardianEmail"],
-        })
-    }
 })
 
 type ApplicationData = z.infer<typeof applicationSchema>
@@ -192,7 +159,6 @@ export function ApplyPage({
         register,
         handleSubmit,
         reset,
-        watch,
         formState: { errors, isSubmitting },
     } = useForm<ApplicationData>({
         resolver: zodResolver(applicationSchema),
@@ -204,10 +170,6 @@ export function ApplyPage({
     const [submitted, setSubmitted] = useState(false)
     const [submitError, setSubmitError] = useState("")
     const fileRefs = useRef<(HTMLInputElement | null)[]>([])
-
-    const dob = watch("dob")
-    const isMinor =
-        Boolean(dob) && !Number.isNaN(Date.parse(dob)) && ageFrom(dob) < 18
 
     const handlePhoto = useCallback((index: number, file: File | null) => {
         if (!file) return
@@ -526,78 +488,6 @@ export function ApplyPage({
                         </div>
                     </div>
 
-                    {isMinor && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="mt-10 border-t border-border pt-6"
-                        >
-                            <p className="text-xs font-medium uppercase tracking-[0.15em] text-foreground">
-                                Parent or guardian
-                            </p>
-                            <p className="mt-2 max-w-lg text-xs leading-relaxed text-muted-foreground">
-                                You are under 18, so we need a parent or legal
-                                guardian we can reach. No agency sees this
-                                application until we have confirmed their
-                                consent.
-                            </p>
-                            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                                <Field
-                                    label="Their name"
-                                    required
-                                    error={errors.guardianName?.message}
-                                >
-                                    <input
-                                        {...register("guardianName")}
-                                        className={fieldClass(
-                                            errors.guardianName,
-                                        )}
-                                        aria-required="true"
-                                    />
-                                </Field>
-                                <Field
-                                    label="Relationship"
-                                    error={errors.guardianRelation?.message}
-                                >
-                                    <input
-                                        {...register("guardianRelation")}
-                                        placeholder="Mother, father, guardian"
-                                        className={fieldClass(
-                                            errors.guardianRelation,
-                                        )}
-                                    />
-                                </Field>
-                                <Field
-                                    label="Their email"
-                                    required
-                                    error={errors.guardianEmail?.message}
-                                >
-                                    <input
-                                        {...register("guardianEmail")}
-                                        type="email"
-                                        className={fieldClass(
-                                            errors.guardianEmail,
-                                        )}
-                                        aria-required="true"
-                                    />
-                                </Field>
-                                <Field
-                                    label="Their phone"
-                                    required
-                                    error={errors.guardianPhone?.message}
-                                >
-                                    <input
-                                        {...register("guardianPhone")}
-                                        type="tel"
-                                        className={fieldClass(
-                                            errors.guardianPhone,
-                                        )}
-                                        aria-required="true"
-                                    />
-                                </Field>
-                            </div>
-                        </motion.div>
-                    )}
                 </Section>
 
                 {/* ── 02 Measurements ── */}
