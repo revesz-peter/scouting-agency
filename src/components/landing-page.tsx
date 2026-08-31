@@ -1,29 +1,7 @@
 import Link from "next/link"
+import { AgencyShowcase } from "@/components/agency-showcase"
 import { Pipeline } from "@/components/pipeline"
 import { RunwaySlideshow } from "@/components/runway-slideshow"
-
-const CAPABILITIES = [
-    {
-        label: "Castings, held here",
-        body: "Open a casting, invite from your shortlist, and see who confirmed and who actually turned up. Notes from the room land on the applicant, so the vote afterwards has something behind it.",
-    },
-    {
-        label: "Your board, exportable",
-        body: "The signed roster in one place — and it leaves when you want it to. A talent's package as a PDF, the whole board as a CSV.",
-    },
-    {
-        label: "Every application, searchable",
-        body: "Filter years of applications by height, measurements, hair, eyes, or city. A client brief becomes a shortlist from faces you already have.",
-    },
-    {
-        label: "Scouts and payouts",
-        body: "Every applicant is credited to the scout who brought them. See who scouted whom on the board, and settle what you owe from the same place.",
-    },
-    {
-        label: "Client submissions",
-        body: "Send a client a link instead of a folder of attachments, and see what they opened and who they picked.",
-    },
-]
 
 const INCLUDED = [
     "All six pipeline stages, from Applied to On the Board",
@@ -33,12 +11,6 @@ const INCLUDED = [
     "Scout credit and payouts on the same board",
     "Unlimited applications, talent, and people on your team",
     "Export any time — a talent as a PDF, the roster as a CSV",
-]
-
-const CAMPAIGN_LINKS = [
-    "milan-open-call",
-    "tiktok-march",
-    "budapest-street-cast",
 ]
 
 export function LandingPage() {
@@ -86,61 +58,7 @@ export function LandingPage() {
                 <h2 className="mt-4 max-w-xl text-2xl leading-[1.15] text-foreground sm:text-3xl font-[family-name:var(--font-libre)]">
                     Scouting is a process. Run it like one.
                 </h2>
-                <div className="mt-12 grid gap-10 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
-                    {CAPABILITIES.map((item) => (
-                        <div key={item.label} className="border-t border-border pt-5">
-                            <p className="text-xs font-medium uppercase tracking-[0.1em] text-foreground">
-                                {item.label}
-                            </p>
-                            <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-                                {item.body}
-                            </p>
-                        </div>
-                    ))}
-                </div>
-
-                <div className="mt-14 grid gap-12 border-t border-border pt-12 lg:grid-cols-2 lg:gap-16">
-                    {/* Links */}
-                    <div className="border border-border p-6 sm:p-8">
-                        <p className="text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">
-                            Your board, hosted
-                        </p>
-                        <p className="mt-4 break-all border-b border-border pb-3 text-sm text-foreground font-[family-name:var(--font-libre)]">
-                            scouting.agency/board/<span className="text-foreground/40">your-agency</span>
-                        </p>
-                        <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-                            Your roster lives here and you manage it here — then
-                            drop it into your own website in an iframe. Sign a
-                            face on Monday and your site is current on Monday,
-                            with no developer in the loop.
-                        </p>
-                    </div>
-
-                    {/* Campaign links */}
-                    <div className="border border-border p-6 sm:p-8">
-                        <p className="text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">
-                            Campaign links
-                        </p>
-                        <ul className="mt-4 space-y-1.5 border-b border-border pb-3">
-                            {CAMPAIGN_LINKS.map((slug) => (
-                                <li
-                                    key={slug}
-                                    className="break-all text-sm text-muted-foreground font-[family-name:var(--font-libre)]"
-                                >
-                                    scouting.agency/l/
-                                    <span className="text-foreground">
-                                        {slug}
-                                    </span>
-                                </li>
-                            ))}
-                        </ul>
-                        <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-                            One per casting call, city, channel, or scout. Every
-                            applicant arrives tagged, so you can see which link
-                            produces faces worth meeting — not just clicks.
-                        </p>
-                    </div>
-                </div>
+                <AgencyShowcase />
             </section>
 
             {/* ── For scouts ── */}

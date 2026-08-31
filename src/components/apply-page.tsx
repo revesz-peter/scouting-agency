@@ -11,10 +11,16 @@ import { Field, fieldClass } from "@/components/form-field"
 import type { Agency } from "@/lib/agencies"
 import type { Scout } from "@/lib/scouts"
 import {
+    BUSTS,
     COUNTRIES,
     EYE_COLORS,
     GENDERS,
     HAIR_COLORS,
+    HEIGHTS,
+    HIPS,
+    SHOE_SIZES,
+    WAISTS,
+    type Option,
 } from "@/lib/application-options"
 
 // ─── Schema ───────────────────────────────────────────────
@@ -41,19 +47,6 @@ function ageFrom(dob: string): number {
         age--
     }
     return age
-}
-
-/** A measurement typed in as a plain number, in cm (or EU for shoes). */
-function measurement(min: number, max: number) {
-    return z
-        .string()
-        .trim()
-        .min(1, "Required")
-        .refine((v) => /^\d+$/.test(v), "Enter a number")
-        .refine(
-            (v) => Number(v) >= min && Number(v) <= max,
-            `Between ${min} and ${max}`,
-        )
 }
 
 
@@ -88,11 +81,11 @@ const applicationSchema = z.object({
     instagram: z.string().trim().optional(),
 
     // 02 Measurements
-    height: measurement(140, 220),
-    bust: measurement(60, 130),
-    waist: measurement(40, 120),
-    hips: measurement(60, 140),
-    shoeSize: measurement(30, 52),
+    height: z.string().min(1, "Required"),
+    bust: z.string().min(1, "Required"),
+    waist: z.string().min(1, "Required"),
+    hips: z.string().min(1, "Required"),
+    shoeSize: z.string().min(1, "Required"),
     hairColor: z.string().min(1, "Required"),
     eyeColor: z.string().min(1, "Required"),
 
@@ -493,40 +486,40 @@ export function ApplyPage({
                 {/* ── 02 Measurements ── */}
                 <Section number="02" title="Measurements">
                     <div className="grid gap-4 sm:grid-cols-2">
-                        <MeasurementField
-                            label="Height (cm)"
+                        <SelectField
+                            label="Height"
+                            required
                             error={errors.height?.message}
+                            options={HEIGHTS}
                             registration={register("height")}
-                            min={140}
-                            max={220}
                         />
-                        <MeasurementField
-                            label="Bust (cm)"
+                        <SelectField
+                            label="Bust"
+                            required
                             error={errors.bust?.message}
+                            options={BUSTS}
                             registration={register("bust")}
-                            min={60}
-                            max={130}
                         />
-                        <MeasurementField
-                            label="Waist (cm)"
+                        <SelectField
+                            label="Waist"
+                            required
                             error={errors.waist?.message}
+                            options={WAISTS}
                             registration={register("waist")}
-                            min={40}
-                            max={120}
                         />
-                        <MeasurementField
-                            label="Hips (cm)"
+                        <SelectField
+                            label="Hips"
+                            required
                             error={errors.hips?.message}
+                            options={HIPS}
                             registration={register("hips")}
-                            min={60}
-                            max={140}
                         />
-                        <MeasurementField
-                            label="Shoe size (EU)"
+                        <SelectField
+                            label="Shoe size"
+                            required
                             error={errors.shoeSize?.message}
+                            options={SHOE_SIZES}
                             registration={register("shoeSize")}
-                            min={30}
-                            max={52}
                         />
                         <SelectField
                             label="Hair color"
@@ -773,36 +766,6 @@ function Section({
     )
 }
 
-// ─── Measurement field ────────────────────────────────────
-
-function MeasurementField({
-    label,
-    error,
-    registration,
-    min,
-    max,
-}: {
-    label: string
-    error?: string
-    registration: ReturnType<ReturnType<typeof useForm<ApplicationData>>["register"]>
-    min: number
-    max: number
-}) {
-    return (
-        <Field label={label} required error={error}>
-            <input
-                {...registration}
-                type="number"
-                inputMode="numeric"
-                min={min}
-                max={max}
-                aria-required="true"
-                className={fieldClass(error ? { message: error } : undefined)}
-            />
-        </Field>
-    )
-}
-
 // ─── Select field ─────────────────────────────────────────
 
 function SelectField({
@@ -815,7 +778,7 @@ function SelectField({
     label: string
     required?: boolean
     error?: string
-    options: string[]
+    options: (string | Option)[]
     registration: ReturnType<ReturnType<typeof useForm<ApplicationData>>["register"]>
 }) {
     return (
@@ -829,11 +792,17 @@ function SelectField({
                 <option value="" disabled>
                     Select…
                 </option>
-                {options.map((option) => (
-                    <option key={option} value={option}>
-                        {option}
-                    </option>
-                ))}
+                {options.map((option) => {
+                    const { value, label } =
+                        typeof option === "string"
+                            ? { value: option, label: option }
+                            : option
+                    return (
+                        <option key={value} value={value}>
+                            {label}
+                        </option>
+                    )
+                })}
             </select>
         </Field>
     )
