@@ -3,7 +3,7 @@ import { STAGES } from "@/lib/pipeline"
 const HIGHLIGHTS = [
     "Every application submitted to the network, reviewed in your own pipeline",
     "Your board hosted here and embeddable on your own site in an iframe — update it once, it updates everywhere",
-    "Campaign links per casting call, city, or channel — each applicant arrives tagged",
+    "Castings run here — invite your shortlist, and see who confirmed and who showed",
     "Scouts credited automatically, with payouts settled from the same board",
     "Export whenever you want: a talent as a PDF, the whole roster as a CSV",
 ]

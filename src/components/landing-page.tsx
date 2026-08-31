@@ -1,14 +1,16 @@
 import Link from "next/link"
 import { AgencyShowcase } from "@/components/agency-showcase"
 import { Pipeline } from "@/components/pipeline"
+import { ScoutShowcase } from "@/components/scout-showcase"
 import { RunwaySlideshow } from "@/components/runway-slideshow"
 
 const INCLUDED = [
     "All six pipeline stages, from Applied to On the Board",
     "Your board hosted, and embeddable on your own site",
-    "Campaign links with source tracking on every applicant",
+    "Castings, with invitations and reminders sent for you",
     "Every application submitted to the network",
-    "Scout credit and payouts on the same board",
+    "Scout links, credit, and payouts on the same board",
+    "Every application searchable, years back, by any measurement",
     "Unlimited applications, talent, and people on your team",
     "Export any time — a talent as a PDF, the roster as a CSV",
 ]
@@ -22,9 +24,10 @@ export function LandingPage() {
                     The progressive infrastructure behind model agencies.
                 </h1>
                 <p className="mt-7 max-w-lg text-xs leading-relaxed text-muted-foreground">
-                    From open call to on the board. Run applications, castings,
-                    board votes, and your roster in one system — instead of an
-                    inbox, a spreadsheet, and a group chat.
+                    From open call to on the board. Applications, castings,
+                    board votes, your scouts and what they are owed, and a
+                    roster you can publish — one system, instead of an inbox, a
+                    spreadsheet, and a group chat.
                 </p>
 
                 <div className="mt-9 flex flex-wrap items-center gap-6">
@@ -63,38 +66,45 @@ export function LandingPage() {
 
             {/* ── For scouts ── */}
             <section className="border-t border-border">
-                <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 sm:px-10 sm:py-28 lg:grid-cols-2 lg:items-center lg:gap-20">
-                    <div>
-                        <p className="text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
-                            For scouts
-                        </p>
-                        <h2 className="mt-4 text-2xl leading-[1.15] text-foreground sm:text-3xl font-[family-name:var(--font-libre)]">
-                            Your link. Your credit.
-                        </h2>
-                        <p className="mt-5 max-w-md text-xs leading-relaxed text-muted-foreground">
-                            Scouts get a workspace of their own. Everyone who
-                            applies through your personal link is credited to
-                            you automatically — through pre-select, the board
-                            vote, and whatever you earn when they sign.
-                        </p>
+                <div className="mx-auto max-w-6xl px-6 py-20 sm:px-10 sm:py-28">
+                    <div className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-20">
+                        <div>
+                            <p className="text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
+                                For scouts
+                            </p>
+                            <h2 className="mt-4 text-2xl leading-[1.15] text-foreground sm:text-3xl font-[family-name:var(--font-libre)]">
+                                Your link. Your card. Your credit.
+                            </h2>
+                            <p className="mt-5 max-w-md text-xs leading-relaxed text-muted-foreground">
+                                Scouts get a workspace of their own, a link to
+                                share, and a card to hand out. Everyone who
+                                applies through any of them is credited to you
+                                automatically — through pre-select, the board
+                                vote, and whatever you earn when they sign.
+                            </p>
+                        </div>
+
+                        {/* The link itself — what you share */}
+                        <div className="border border-border p-6 sm:p-8 lg:w-full lg:max-w-md lg:justify-self-end">
+                            <p className="text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                                Your personal scouting link
+                            </p>
+                            <p className="mt-4 break-all border-b border-border pb-3 text-sm text-foreground font-[family-name:var(--font-libre)]">
+                                scouting.agency/s/<span className="text-foreground/40">your-name</span>
+                            </p>
+                            <p className="mt-5 text-xs font-medium uppercase tracking-[0.1em] text-foreground">
+                                Share this link
+                            </p>
+                            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                                Put it in your Instagram or TikTok bio and in
+                                your posts. Anyone who applies through it is
+                                credited to you automatically.
+                            </p>
+                        </div>
                     </div>
 
-                    {/* Personal link */}
-                    <div className="border border-border p-8 sm:p-10 lg:justify-self-end lg:w-full lg:max-w-md">
-                        <p className="text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">
-                            Your personal scouting link
-                        </p>
-                        <p className="mt-4 break-all border-b border-border pb-3 text-sm text-foreground font-[family-name:var(--font-libre)]">
-                            scouting.agency/s/<span className="text-foreground/40">your-name</span>
-                        </p>
-                        <p className="mt-6 text-xs font-medium uppercase tracking-[0.1em] text-foreground">
-                            Share this link
-                        </p>
-                        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                            Put it in your Instagram or TikTok bio and in your
-                            posts. Anyone who applies through it is credited to
-                            you automatically.
-                        </p>
+                    <div className="mt-16">
+                        <ScoutShowcase />
                     </div>
                 </div>
             </section>

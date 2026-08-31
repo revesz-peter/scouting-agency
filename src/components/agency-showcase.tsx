@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { Check, Download, GripVertical, ListPlus, Send } from "lucide-react"
-import { AGENCIES } from "@/lib/agencies"
 
 // ─── Mock talent used across the panels ───────────────────
 
@@ -36,8 +35,9 @@ const TABS = [
     { key: "filter", label: "Filter", blurb: "Set the bar and the board answers. Height, age, measurements, city — across every application you have ever received, not just this month's." },
     { key: "stages", label: "Stages", blurb: "Drag a face from one stage to the next. The move is the record: who advanced them, when, and what happened after." },
     { key: "casting", label: "Castings", blurb: "Invite your shortlist to an online casting in one click. Everyone selected gets the time, the link, and a reminder — written once, sent automatically." },
-    { key: "links", label: "Links & QR", blurb: "Every scout gets a link, a QR code, and a business card that carries it. Print it, hand it out on the street, and the applications arrive credited." },
+    { key: "scouts", label: "Scouts", blurb: "Every application is credited to the scout whose link it came through. See who is actually producing, and what you owe them, in one place." },
     { key: "board", label: "Board", blurb: "Your roster, hosted here and embedded on your own site. Export a talent as a PDF or the whole board as a CSV whenever you want." },
+    { key: "talent", label: "One talent", blurb: "Everything about one face on a single screen — digitals, measurements, how to reach them, who scouted them, and every step they have taken since." },
 ] as const
 
 type TabKey = (typeof TABS)[number]["key"]
@@ -88,8 +88,9 @@ export function AgencyShowcase() {
                         {tab === "filter" && <FilterPanel />}
                         {tab === "stages" && <StagesPanel />}
                         {tab === "casting" && <CastingPanel />}
-                        {tab === "links" && <LinksPanel />}
+                        {tab === "scouts" && <ScoutsPanel />}
                         {tab === "board" && <BoardPanel />}
+                        {tab === "talent" && <TalentPanel />}
                     </motion.div>
                 </AnimatePresence>
             </div>
@@ -488,302 +489,160 @@ function CastingPanel() {
     )
 }
 
-// ─── 4. Links & QR ────────────────────────────────────────
+// ─── 4. Scouts ────────────────────────────────────────────
 
-/** Deterministic QR-style block. Illustrative, not a scannable code. */
-function QrBlock({ seed, className = "" }: { seed: string; className?: string }) {
-    const cells = 21
-    const filled = useMemo(() => {
-        let h = 0
-        for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) | 0
-        const out: boolean[] = []
-        for (let i = 0; i < cells * cells; i++) {
-            h = (h * 1103515245 + 12345) | 0
-            out.push(((h >> 16) & 1) === 1)
-        }
-        return out
-    }, [seed])
-
-    const isFinder = (x: number, y: number) =>
-        (x < 7 && y < 7) || (x > cells - 8 && y < 7) || (x < 7 && y > cells - 8)
-
-    return (
-        <svg viewBox={`0 0 ${cells} ${cells}`} className={className} aria-hidden>
-            <rect width={cells} height={cells} fill="#fff" />
-            {Array.from({ length: cells * cells }).map((_, i) => {
-                const x = i % cells
-                const y = Math.floor(i / cells)
-                if (isFinder(x, y)) return null
-                return filled[i] ? (
-                    <rect key={i} x={x} y={y} width={1} height={1} fill="#000" />
-                ) : null
-            })}
-            {[[0, 0], [cells - 7, 0], [0, cells - 7]].map(([fx, fy]) => (
-                <g key={`${fx}-${fy}`}>
-                    <rect x={fx} y={fy} width={7} height={7} fill="#000" />
-                    <rect x={fx + 1} y={fy + 1} width={5} height={5} fill="#fff" />
-                    <rect x={fx + 2} y={fy + 2} width={3} height={3} fill="#000" />
-                </g>
-            ))}
-        </svg>
-    )
-}
-
-const CARD_DESIGNS = [
-    { key: "plain", label: "Plain" },
-    { key: "inverted", label: "Inverted" },
-    { key: "rule", label: "Rule" },
-    { key: "editorial", label: "Editorial" },
-] as const
-
-type CardDesign = (typeof CARD_DESIGNS)[number]["key"]
-
-function slugify(value: string) {
-    return (
-        value
-            .trim()
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-|-$/g, "") || "your-name"
-    )
-}
-
-interface CardProps {
-    design: CardDesign
+interface ScoutRow {
     name: string
-    title: string
-    agency: string
     city: string
-    code: string
+    applied: number
+    kept: number
+    signed: number
+    owed: number
 }
 
-/** Oversized initial bleeding off the card — the editorial design's anchor. */
-function Watermark({ letter, dark }: { letter: string; dark: boolean }) {
-    return (
-        <span
-            aria-hidden
-            className={`pointer-events-none absolute -bottom-8 -right-2 select-none text-[8rem] leading-none font-[family-name:var(--font-libre)] ${
-                dark ? "text-background/10" : "text-foreground/[0.07]"
-            }`}
-        >
-            {letter}
-        </span>
+const SCOUT_ROWS: ScoutRow[] = [
+    { name: "Emma", city: "Copenhagen", applied: 58, kept: 22, signed: 3, owed: 600 },
+    { name: "Alice", city: "Milan", applied: 34, kept: 9, signed: 1, owed: 200 },
+    { name: "Clara", city: "Berlin", applied: 145, kept: 19, signed: 1, owed: 0 },
+    { name: "Nora", city: "Budapest", applied: 312, kept: 21, signed: 0, owed: 0 },
+]
+
+type SortKey = "applied" | "rate"
+
+function rateOf(s: ScoutRow) {
+    return s.kept / s.applied
+}
+
+function ScoutsPanel() {
+    const [sort, setSort] = useState<SortKey>("rate")
+
+    const rows = useMemo(
+        () =>
+            [...SCOUT_ROWS].sort((a, b) =>
+                sort === "applied" ? b.applied - a.applied : rateOf(b) - rateOf(a),
+            ),
+        [sort],
     )
-}
 
-function CardFront({ design, name, title, agency, city }: CardProps) {
-    const dark = design === "inverted"
-    const editorial = design === "editorial"
-    const displayName = name.trim() || "Your name"
-    const sub = [title.trim() || "Scout", agency, city.trim()]
-        .filter(Boolean)
-        .join(" · ")
+    const best = Math.max(...SCOUT_ROWS.map(rateOf))
+    const owed = SCOUT_ROWS.reduce((sum, r) => sum + r.owed, 0)
 
     return (
-        <div
-            className={`relative flex aspect-[85/55] w-full max-w-[280px] flex-col justify-between overflow-hidden p-4 ${
-                dark
-                    ? "bg-foreground text-background"
-                    : "border border-border bg-background"
-            }`}
-        >
-            {design === "rule" && (
-                <div className="-mx-4 -mt-4 mb-3 h-1.5 bg-foreground" />
-            )}
-            {editorial && (
-                <Watermark letter={displayName.charAt(0).toUpperCase()} dark={false} />
-            )}
-
-            <p
-                className={`relative text-xs font-bold uppercase tracking-[0.25em] ${
-                    dark ? "text-background/70" : "text-black/60"
-                }`}
-            >
-                scouting.
+        <div>
+            <p className="mb-5 max-w-lg text-xs leading-relaxed text-muted-foreground">
+                Every application remembers the scout whose link it came
+                through. So each scout becomes two numbers: how many people
+                applied, and how many of those your bookers kept at Pre-Select.
             </p>
 
-            <div className="relative">
-                <p
-                    className={`text-base leading-tight font-[family-name:var(--font-libre)] ${
-                        dark ? "text-background" : "text-foreground"
-                    }`}
-                >
-                    {displayName}
-                </p>
-                <p
-                    className={`mt-1 text-xs leading-relaxed ${
-                        dark ? "text-background/60" : "text-muted-foreground"
-                    }`}
-                >
-                    {sub}
-                </p>
+            <div className="overflow-x-auto">
+                <table className="w-full min-w-[520px] border-collapse text-xs">
+                    <thead>
+                        <tr className="border-b border-border">
+                            <th className="py-2 text-left font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                                Scout
+                            </th>
+                            <th className="py-2 text-right">
+                                <button
+                                    type="button"
+                                    onClick={() => setSort("applied")}
+                                    aria-pressed={sort === "applied"}
+                                    className={`font-medium uppercase tracking-[0.1em] transition-colors ${
+                                        sort === "applied"
+                                            ? "text-foreground underline underline-offset-4"
+                                            : "text-muted-foreground hover:text-foreground"
+                                    }`}
+                                >
+                                    Applied
+                                </button>
+                            </th>
+                            <th className="py-2 text-right font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                                Kept
+                            </th>
+                            <th className="py-2 pl-4 text-right">
+                                <button
+                                    type="button"
+                                    onClick={() => setSort("rate")}
+                                    aria-pressed={sort === "rate"}
+                                    className={`font-medium uppercase tracking-[0.1em] transition-colors ${
+                                        sort === "rate"
+                                            ? "text-foreground underline underline-offset-4"
+                                            : "text-muted-foreground hover:text-foreground"
+                                    }`}
+                                >
+                                    Kept rate
+                                </button>
+                            </th>
+                            <th className="py-2 pl-4 text-right font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                                Signed
+                            </th>
+                            <th className="py-2 pl-4 text-right font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                                Owed
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {rows.map((r) => {
+                            const rate = rateOf(r)
+                            return (
+                                <tr key={r.name} className="border-b border-border">
+                                    <td className="py-3">
+                                        <span className="text-foreground">{r.name}</span>
+                                        <span className="mt-0.5 block text-muted-foreground">
+                                            {r.city}
+                                        </span>
+                                    </td>
+                                    <td className="py-3 text-right text-foreground">
+                                        {r.applied}
+                                    </td>
+                                    <td className="py-3 text-right text-foreground">
+                                        {r.kept}
+                                    </td>
+                                    <td className="py-3 pl-4 text-right">
+                                        <span className="text-foreground">
+                                            {Math.round(rate * 100)}%
+                                        </span>
+                                        <span className="mt-1 block h-[3px] w-full bg-black/[0.06]">
+                                            <span
+                                                className="block h-full bg-foreground"
+                                                style={{ width: `${(rate / best) * 100}%` }}
+                                            />
+                                        </span>
+                                    </td>
+                                    <td className="py-3 pl-4 text-right text-foreground">
+                                        {r.signed || "—"}
+                                    </td>
+                                    <td className="py-3 pl-4 text-right text-foreground">
+                                        {r.owed ? `€${r.owed}` : "—"}
+                                    </td>
+                                </tr>
+                            )
+                        })}
+                    </tbody>
+                </table>
             </div>
-        </div>
-    )
-}
 
-function CardBack({ design, name, code }: CardProps) {
-    const dark = design === "inverted" || design === "editorial"
-    const url = `scouting.agency/s/${code}`
-
-    return (
-        <div
-            className={`relative flex aspect-[85/55] w-full max-w-[280px] flex-col items-center justify-center gap-2.5 overflow-hidden p-4 ${
-                dark
-                    ? "bg-foreground text-background"
-                    : "border border-border bg-background"
-            }`}
-        >
-            {design === "rule" && (
-                <div className="absolute inset-x-0 bottom-0 h-1.5 bg-foreground" />
-            )}
-            {design === "editorial" && (
-                <Watermark
-                    letter={(name.trim() || "Y").charAt(0).toUpperCase()}
-                    dark
-                />
-            )}
-
-            <div className={`relative ${dark ? "bg-background p-1.5" : ""}`}>
-                <QrBlock seed={code} className="h-16 w-16" />
+            <div className="mt-5 flex flex-wrap items-center gap-4 border-t border-border pt-5">
+                <p className="text-xs text-muted-foreground">
+                    Outstanding{" "}
+                    <span className="text-foreground">€{owed}</span>
+                </p>
+                <button
+                    type="button"
+                    className="border border-border px-4 py-2 text-xs font-medium uppercase tracking-[0.1em] text-foreground transition-colors hover:border-foreground/30"
+                >
+                    Settle payouts
+                </button>
             </div>
-            <p
-                className={`relative break-all text-center text-xs leading-relaxed ${
-                    dark ? "text-background/70" : "text-muted-foreground"
-                }`}
-            >
-                {url}
+
+            <p className="mt-5 max-w-lg text-xs leading-relaxed text-muted-foreground">
+                Nora sent five times what Emma did — 312 applications against
+                58 — and your bookers kept one fewer of them. Emma has signed
+                three faces this year; Nora none. Anyone can post a link and
+                collect volume. The kept rate is what tells you who to pay more,
+                and who to coach.
             </p>
         </div>
-    )
-}
-
-function LinksPanel() {
-    const [name, setName] = useState("Peter")
-    const [title, setTitle] = useState("Scout")
-    const [agency, setAgency] = useState("")
-    const [city, setCity] = useState("Budapest")
-    const [design, setDesign] = useState<CardDesign>("plain")
-    const code = slugify(name)
-
-    return (
-        <div className="grid gap-8 lg:grid-cols-2 lg:gap-10">
-            <div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <CardField label="Name" value={name} onChange={setName} />
-                    <CardField
-                        label="Title"
-                        value={title}
-                        onChange={setTitle}
-                        placeholder="Scout"
-                    />
-                    <CardField label="City" value={city} onChange={setCity} />
-                    <label className="block sm:col-span-2">
-                        <span className="text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">
-                            Agency
-                        </span>
-                        <select
-                            value={agency}
-                            onChange={(e) => setAgency(e.target.value)}
-                            className="mt-1.5 w-full appearance-none rounded-none border-b border-border bg-transparent py-1.5 text-xs outline-none transition-colors focus:border-foreground/30"
-                        >
-                            <option value="">No agency</option>
-                            {AGENCIES.map((a) => (
-                                <option key={a.slug} value={a.name}>
-                                    {a.name}
-                                </option>
-                            ))}
-                        </select>
-                        <span className="mt-1.5 block text-xs text-muted-foreground">
-                            The agencies that invited you — or none, and the
-                            card is just yours.
-                        </span>
-                    </label>
-                </div>
-
-                <div className="mt-6">
-                    <span className="text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">
-                        Design
-                    </span>
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                        {CARD_DESIGNS.map((d) => (
-                            <button
-                                key={d.key}
-                                type="button"
-                                onClick={() => setDesign(d.key)}
-                                aria-pressed={design === d.key}
-                                className={`border px-3 py-1.5 text-xs transition-colors ${
-                                    design === d.key
-                                        ? "border-foreground bg-foreground text-background"
-                                        : "border-border text-muted-foreground hover:border-foreground/30"
-                                }`}
-                            >
-                                {d.label}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                <p className="mt-6 break-all border-t border-border pt-5 text-sm text-foreground font-[family-name:var(--font-libre)]">
-                    scouting.agency/s/<span className="text-foreground/40">{code}</span>
-                </p>
-                <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-                    The link, the QR, and the card are one thing. Print the card,
-                    hand it to someone on the street, and their application
-                    arrives credited to you — at the agency you picked, or
-                    across the whole network if you pick none.
-                </p>
-            </div>
-
-            <div className="flex flex-col items-center gap-5 bg-black/[0.03] p-6">
-                {(
-                    [
-                        ["Front", CardFront],
-                        ["Back", CardBack],
-                    ] as const
-                ).map(([label, Face]) => (
-                    <div key={label} className="w-full max-w-[280px]">
-                        <p className="mb-1.5 text-xs uppercase tracking-[0.1em] text-muted-foreground">
-                            {label}
-                        </p>
-                        <Face
-                            design={design}
-                            name={name}
-                            title={title}
-                            agency={agency}
-                            city={city}
-                            code={code}
-                        />
-                    </div>
-                ))}
-            </div>
-        </div>
-    )
-}
-
-function CardField({
-    label,
-    value,
-    onChange,
-    placeholder,
-}: {
-    label: string
-    value: string
-    onChange: (v: string) => void
-    placeholder?: string
-}) {
-    return (
-        <label className="block">
-            <span className="text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">
-                {label}
-            </span>
-            <input
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                placeholder={placeholder}
-                className="mt-1.5 w-full border-b border-border bg-transparent py-1.5 text-xs outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-foreground/30"
-            />
-        </label>
     )
 }
 
@@ -803,8 +662,7 @@ function BoardPanel() {
                 </p>
                 <p className="mt-3 max-w-lg text-xs leading-relaxed text-muted-foreground">
                     Send it to a client, put it in your bio, or embed the same
-                    board in your own website. Sign a face on Monday and every
-                    one of those is current on Monday.
+                    board in your own website.
                 </p>
             </div>
 
@@ -844,6 +702,179 @@ function BoardPanel() {
   .agency/board/your-agency" />`}
                         </pre>
                     </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+// ─── 6. One talent ────────────────────────────────────────
+
+const DIGITALS = ["Headshot", "Profile left", "Profile right", "Full body"]
+
+const TALENT = {
+    name: "Mira S.",
+    age: 19,
+    height: 181,
+    bust: 80,
+    waist: 59,
+    hips: 87,
+    shoe: 40,
+    hair: "Brown",
+    eyes: "Green",
+    city: "Prague",
+    country: "Czechia",
+    email: "mira.s@example.com",
+    phone: "+420 601 234 567",
+    instagram: "@mira.s",
+    portfolio: "drive.google.com/…",
+    scout: "Peter",
+    scoutLink: "scouting.agency/s/peter",
+    stage: "Final Voting",
+    votesYes: 4,
+    votesOf: 5,
+    history: [
+        { label: "Applied", when: "4 Mar" },
+        { label: "Pre-Select", when: "6 Mar" },
+        { label: "Casting attended", when: "12 Mar" },
+        { label: "Final Voting", when: "14 Mar" },
+    ],
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+    return (
+        <div className="flex items-baseline justify-between gap-4 py-1.5">
+            <span className="text-xs text-muted-foreground">{label}</span>
+            <span className="break-all text-right text-xs text-foreground">
+                {value}
+            </span>
+        </div>
+    )
+}
+
+function InfoGroup({
+    title,
+    children,
+}: {
+    title: string
+    children: React.ReactNode
+}) {
+    return (
+        <div className="border-t border-border pt-4">
+            <p className="mb-1.5 text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                {title}
+            </p>
+            {children}
+        </div>
+    )
+}
+
+function TalentPanel() {
+    const [shot, setShot] = useState(0)
+
+    return (
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,300px)_1fr] lg:gap-10">
+            {/* Digitals */}
+            <div>
+                <div className="flex aspect-4/5 items-end bg-black/[0.04] p-3">
+                    <span className="text-xs uppercase tracking-[0.1em] text-foreground/30">
+                        {DIGITALS[shot]}
+                    </span>
+                </div>
+                <div className="mt-2 grid grid-cols-4 gap-2">
+                    {DIGITALS.map((label, i) => (
+                        <button
+                            key={label}
+                            type="button"
+                            onClick={() => setShot(i)}
+                            aria-label={label}
+                            aria-pressed={shot === i}
+                            className={`aspect-4/5 border transition-colors ${
+                                shot === i
+                                    ? "border-foreground bg-black/[0.06]"
+                                    : "border-border bg-black/[0.03] hover:border-foreground/30"
+                            }`}
+                        />
+                    ))}
+                </div>
+            </div>
+
+            {/* Everything else */}
+            <div>
+                <div className="flex flex-wrap items-baseline justify-between gap-3">
+                    <h3 className="text-2xl leading-none text-foreground font-[family-name:var(--font-libre)]">
+                        {TALENT.name}
+                    </h3>
+                    <span className="border border-foreground px-2 py-1 text-xs font-medium uppercase tracking-[0.1em] text-foreground">
+                        {TALENT.stage}
+                    </span>
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">
+                    {TALENT.age} · {TALENT.city}, {TALENT.country}
+                </p>
+
+                <div className="mt-6 grid gap-6 sm:grid-cols-2 sm:gap-x-10">
+                    <InfoGroup title="Measurements">
+                        <InfoRow label="Height" value={`${TALENT.height} cm`} />
+                        <InfoRow
+                            label="Bust · Waist · Hips"
+                            value={`${TALENT.bust} · ${TALENT.waist} · ${TALENT.hips}`}
+                        />
+                        <InfoRow label="Shoe" value={`${TALENT.shoe} EU`} />
+                        <InfoRow label="Hair · Eyes" value={`${TALENT.hair} · ${TALENT.eyes}`} />
+                    </InfoGroup>
+
+                    <InfoGroup title="Contact">
+                        <InfoRow label="Email" value={TALENT.email} />
+                        <InfoRow label="Phone" value={TALENT.phone} />
+                        <InfoRow label="Instagram" value={TALENT.instagram} />
+                        <InfoRow label="Book" value={TALENT.portfolio} />
+                    </InfoGroup>
+
+                    <InfoGroup title="Where she came from">
+                        <InfoRow label="Scouted by" value={TALENT.scout} />
+                        <InfoRow label="Through" value={TALENT.scoutLink} />
+                        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                            Credited automatically. If she signs, the payout
+                            follows this line.
+                        </p>
+                    </InfoGroup>
+
+                    <InfoGroup title="History">
+                        {TALENT.history.map((step) => (
+                            <InfoRow
+                                key={step.label}
+                                label={step.label}
+                                value={step.when}
+                            />
+                        ))}
+                        <p className="mt-2 text-xs text-foreground">
+                            Board vote: {TALENT.votesYes} of {TALENT.votesOf} yes
+                        </p>
+                    </InfoGroup>
+                </div>
+
+                <div className="mt-7 flex flex-wrap gap-3 border-t border-border pt-5">
+                    <button
+                        type="button"
+                        className="bg-foreground px-5 py-2.5 text-xs font-medium uppercase tracking-[0.15em] text-background transition-colors hover:bg-foreground/90"
+                    >
+                        Move to Onboarding
+                    </button>
+                    <button
+                        type="button"
+                        className="flex items-center gap-2 border border-border px-4 py-2.5 text-xs font-medium uppercase tracking-[0.1em] text-foreground transition-colors hover:border-foreground/30"
+                    >
+                        <Download className="h-3 w-3" />
+                        Export as PDF
+                    </button>
+                    <button
+                        type="button"
+                        className="flex items-center gap-2 border border-border px-4 py-2.5 text-xs font-medium uppercase tracking-[0.1em] text-foreground transition-colors hover:border-foreground/30"
+                    >
+                        <Send className="h-3 w-3" />
+                        Submit to client
+                    </button>
                 </div>
             </div>
         </div>
