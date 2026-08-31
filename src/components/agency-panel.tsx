@@ -2,7 +2,8 @@ import { STAGES } from "@/lib/pipeline"
 
 const HIGHLIGHTS = [
     "Every application submitted to the network, reviewed in your own pipeline",
-    "Your board hosted here and embeddable on your own site in an iframe — update it once, it updates everywhere",
+    "Years of applications searchable by height, measurements, hair, or city",
+    "Your board hosted here and embeddable on your own site in an iframe",
     "Castings run here — invite your shortlist, and see who confirmed and who showed",
     "Scouts credited automatically, with payouts settled from the same board",
     "Export whenever you want: a talent as a PDF, the whole roster as a CSV",
@@ -21,7 +22,7 @@ export function AgencyPanel() {
                 </h2>
                 <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
                     Applications arrive structured rather than as inbox
-                    attachments. Your scouts shortlist and schedule, the board
+                    attachments. Your bookers shortlist and schedule, the board
                     votes on record, and signed talent lands on your board —
                     without leaving the system.
                 </p>
@@ -70,8 +71,7 @@ export function AgencyPanel() {
                         €150 / month
                     </p>
                     <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                        First month free while we set you up. Per agency,
-                        everything included.
+                        First month free. Per agency, everything included.
                     </p>
                 </div>
             </div>

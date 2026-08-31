@@ -18,12 +18,6 @@ export function SiteHeader() {
                         Pricing
                     </Link>
                     <Link
-                        href="/apply"
-                        className="text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:text-foreground"
-                    >
-                        Apply
-                    </Link>
-                    <Link
                         href="/agency/sign-in"
                         className="bg-foreground px-4 py-2 text-xs font-medium uppercase tracking-[0.1em] text-background transition-colors hover:bg-foreground/90"
                     >

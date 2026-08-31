@@ -38,10 +38,10 @@ export function LandingPage() {
                         Agency sign in
                     </Link>
                     <Link
-                        href="/apply"
+                        href="#pipeline"
                         className="text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
                     >
-                        Apply as a model
+                        See how it works
                     </Link>
                 </div>
 
@@ -89,8 +89,14 @@ export function LandingPage() {
                             <p className="text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">
                                 Your personal scouting link
                             </p>
-                            <p className="mt-4 break-all border-b border-border pb-3 text-sm text-foreground font-[family-name:var(--font-libre)]">
+                            <Link
+                                href="/apply"
+                                className="mt-4 block break-all border-b border-border pb-3 text-sm text-foreground underline underline-offset-4 transition-colors font-[family-name:var(--font-libre)] hover:text-muted-foreground"
+                            >
                                 scouting.agency/s/<span className="text-foreground/40">your-name</span>
+                            </Link>
+                            <p className="mt-2 text-xs text-muted-foreground">
+                                Opens the form an applicant fills in.
                             </p>
                             <p className="mt-5 text-xs font-medium uppercase tracking-[0.1em] text-foreground">
                                 Share this link
@@ -132,11 +138,10 @@ export function LandingPage() {
                                 Your first month is free.
                             </p>
                             <p className="mt-6 max-w-sm text-xs leading-relaxed text-muted-foreground">
-                                We set you up, your link goes live, and you pay
-                                nothing until applications are actually landing.
-                                One price for the agency after that — not per
-                                seat, not per application, not a cut of what you
-                                sign.
+                                One price for the agency — not per seat, not per
+                                application, not a cut of what you sign. No
+                                setup fee, and you can leave whenever, taking
+                                your board with you.
                             </p>
 
                             <Link
@@ -172,31 +177,6 @@ export function LandingPage() {
                 </div>
             </section>
 
-            {/* ── For models ── */}
-            <section className="border-t border-border">
-                <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-20 sm:flex-row sm:items-end sm:justify-between sm:px-10 sm:py-24">
-                    <div>
-                        <p className="text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
-                            For models
-                        </p>
-                        <h2 className="mt-4 max-w-md text-2xl leading-[1.15] text-foreground sm:text-3xl font-[family-name:var(--font-libre)]">
-                            One application, every agency.
-                        </h2>
-                        <p className="mt-5 max-w-md text-xs leading-relaxed text-muted-foreground">
-                            Your details and digitals go to every agency on the
-                            platform at once. Each reviews independently, and
-                            any of them may contact you. No experience needed,
-                            no fee, ever.
-                        </p>
-                    </div>
-                    <Link
-                        href="/apply"
-                        className="shrink-0 bg-foreground px-7 py-3 text-center text-xs font-medium uppercase tracking-[0.15em] text-background transition-colors hover:bg-foreground/90"
-                    >
-                        Apply as a model
-                    </Link>
-                </div>
-            </section>
         </main>
     )
 }

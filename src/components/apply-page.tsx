@@ -294,68 +294,31 @@ export function ApplyPage({
         <main className="mx-auto w-full max-w-2xl px-6 py-16 sm:px-10 sm:py-20">
             {/* ── Intro ── */}
             <p className="text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
-                {scoped ? "Direct application" : "One application · every agency"}
+                {scoped ? "Direct application" : "Application"}
             </p>
             <h1 className="mt-4 text-3xl leading-[1.1] text-foreground sm:text-4xl font-[family-name:var(--font-libre)]">
                 Become a model
             </h1>
+            {scoped && agencies[0] && (
+                <p className="mt-5 max-w-xl text-xs leading-relaxed text-muted-foreground">
+                    You followed {agencies[0].name}&apos;s link, so your
+                    application goes to them alone.
+                </p>
+            )}
             <p className="mt-5 max-w-xl text-xs leading-relaxed text-muted-foreground">
-                {scoped ? (
-                    <>
-                        You followed {agencies[0]?.name}&apos;s application
-                        link, so your details go to them and no one else. They
-                        review it directly and will contact you if there&apos;s
-                        a match.
-                    </>
-                ) : (
-                    <>
-                        This is a network application: your details are sent to
-                        every modelling agency on scouting — currently{" "}
-                        {agencies.length}{" "}
-                        {agencies.length === 1 ? "agency" : "agencies"}. Each
-                        agency reviews it independently and any of them may
-                        contact you.
-                    </>
-                )}{" "}
-                No professional photos required — natural, un-retouched digitals
-                in soft daylight.
+                Think polaroids. A portrait, a profile and a full body, taken on
+                your phone in daylight against a plain wall. Wear simple, fitted
+                clothes — jeans and a plain top are perfect. Hair down, no
+                make-up, no filters, nothing edited. Untouched is exactly what
+                an agency wants to see.
             </p>
 
-            {/* ── Recipients ── */}
-            <div className="mt-10 border border-border p-5">
-                <p className="text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">
-                    You are applying to
+            {referrer && (
+                <p className="mt-6 max-w-xl text-xs leading-relaxed text-muted-foreground">
+                    You came through {referrer.name}&apos;s scouting link, so
+                    your application is credited to them.
                 </p>
-                <ul className="mt-3 space-y-1.5">
-                    {agencies.map((agency) => (
-                        <li
-                            key={agency.slug}
-                            className="flex items-baseline justify-between gap-4"
-                        >
-                            <span className="text-sm text-foreground font-[family-name:var(--font-libre)]">
-                                {agency.name}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                                {agency.location}
-                            </span>
-                        </li>
-                    ))}
-                </ul>
-                {referrer && (
-                    <p className="mt-4 border-t border-border pt-4 text-xs leading-relaxed text-muted-foreground">
-                        You came through {referrer.name}&apos;s scouting link,
-                        so your application is credited to them.
-                    </p>
-                )}
-                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-                    By submitting, you agree that your application and photos
-                    are shared with{" "}
-                    {agencies.length === 1
-                        ? "the agency listed above"
-                        : "each agency listed above"}
-                    .
-                </p>
-            </div>
+            )}
 
             <form
                 onSubmit={handleSubmit(onSubmit)}

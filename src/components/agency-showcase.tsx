@@ -642,6 +642,22 @@ function ScoutsPanel() {
                 collect volume. The kept rate is what tells you who to pay more,
                 and who to coach.
             </p>
+
+            {/* Recruiting the scouts in the first place */}
+            <div className="mt-8 border-t border-border pt-6">
+                <p className="text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                    Hiring scouts
+                </p>
+                <p className="mt-3 break-all text-sm text-foreground font-[family-name:var(--font-libre)]">
+                    scouting.agency/scout/
+                    <span className="text-foreground/40">your-agency</span>
+                </p>
+                <p className="mt-3 max-w-lg text-xs leading-relaxed text-muted-foreground">
+                    Share it and anyone can apply to scout for you. Approve them
+                    and they get their own link, QR and card the same day — on
+                    the bonus arrangement you set.
+                </p>
+            </div>
         </div>
     )
 }

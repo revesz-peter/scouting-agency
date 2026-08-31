@@ -74,16 +74,6 @@ export function AgencySignInForm() {
                     Scouts sign in here too — your workspace and personal link
                     are behind the same door.
                 </p>
-                <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-                    Looking to be scouted?{" "}
-                    <Link
-                        href="/apply"
-                        className="underline underline-offset-4 transition-colors hover:text-foreground"
-                    >
-                        Apply as a model
-                    </Link>
-                    .
-                </p>
             </div>
         </div>
     )
