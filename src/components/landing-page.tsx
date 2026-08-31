@@ -152,8 +152,7 @@ export function LandingPage() {
                             </Link>
 
                             <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
-                                Free, always, for models and scouts — nobody
-                                pays to be seen.
+                                Applicants and scouts are never charged.
                             </p>
                         </div>
 
