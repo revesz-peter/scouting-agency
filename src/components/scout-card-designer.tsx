@@ -1,42 +1,47 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import qrcode from "qrcode-generator"
 import { AGENCIES } from "@/lib/agencies"
 
-/** Deterministic QR-style block. Illustrative, not a scannable code. */
-function QrBlock({ seed, className = "" }: { seed: string; className?: string }) {
-    const cells = 21
-    const filled = useMemo(() => {
-        let h = 0
-        for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) | 0
-        const out: boolean[] = []
-        for (let i = 0; i < cells * cells; i++) {
-            h = (h * 1103515245 + 12345) | 0
-            out.push(((h >> 16) & 1) === 1)
+/** A real, scannable QR code rendered as SVG rectangles. */
+function QrBlock({ value, className = "" }: { value: string; className?: string }) {
+    const { cells, dark } = useMemo(() => {
+        // Type 0 picks the smallest version that fits; M survives a reprint.
+        const qr = qrcode(0, "M")
+        qr.addData(value)
+        qr.make()
+        const count = qr.getModuleCount()
+        const on: [number, number][] = []
+        for (let row = 0; row < count; row++) {
+            for (let col = 0; col < count; col++) {
+                if (qr.isDark(row, col)) on.push([col, row])
+            }
         }
-        return out
-    }, [seed])
+        return { cells: count, dark: on }
+    }, [value])
 
-    const isFinder = (x: number, y: number) =>
-        (x < 7 && y < 7) || (x > cells - 8 && y < 7) || (x < 7 && y > cells - 8)
+    // A quiet zone is part of the spec — without it scanners struggle.
+    const quiet = 2
+    const size = cells + quiet * 2
 
     return (
-        <svg viewBox={`0 0 ${cells} ${cells}`} className={className} aria-hidden>
-            <rect width={cells} height={cells} fill="#fff" />
-            {Array.from({ length: cells * cells }).map((_, i) => {
-                const x = i % cells
-                const y = Math.floor(i / cells)
-                if (isFinder(x, y)) return null
-                return filled[i] ? (
-                    <rect key={i} x={x} y={y} width={1} height={1} fill="#000" />
-                ) : null
-            })}
-            {[[0, 0], [cells - 7, 0], [0, cells - 7]].map(([fx, fy]) => (
-                <g key={`${fx}-${fy}`}>
-                    <rect x={fx} y={fy} width={7} height={7} fill="#000" />
-                    <rect x={fx + 1} y={fy + 1} width={5} height={5} fill="#fff" />
-                    <rect x={fx + 2} y={fy + 2} width={3} height={3} fill="#000" />
-                </g>
+        <svg
+            viewBox={`0 0 ${size} ${size}`}
+            className={className}
+            role="img"
+            aria-label={`QR code for ${value}`}
+        >
+            <rect width={size} height={size} fill="#fff" />
+            {dark.map(([x, y]) => (
+                <rect
+                    key={`${x}-${y}`}
+                    x={x + quiet}
+                    y={y + quiet}
+                    width={1}
+                    height={1}
+                    fill="#000"
+                />
             ))}
         </svg>
     )
@@ -50,6 +55,9 @@ const CARD_DESIGNS = [
 ] as const
 
 type CardDesign = (typeof CARD_DESIGNS)[number]["key"]
+
+/** Where the demo card's QR actually goes — a live page, so it scans. */
+const QR_TARGET = "https://scouting.agency/apply"
 
 function slugify(value: string) {
     return (
@@ -158,7 +166,7 @@ function CardBack({ design, name, code }: CardProps) {
             )}
 
             <div className={`relative ${dark ? "bg-background p-1.5" : ""}`}>
-                <QrBlock seed={code} className="h-16 w-16" />
+                <QrBlock value={QR_TARGET} className="h-16 w-16" />
             </div>
             <p
                 className={`relative break-all text-center text-xs leading-relaxed ${
@@ -260,6 +268,9 @@ export function ScoutCardDesigner() {
                         />
                     </div>
                 ))}
+                <p className="w-full max-w-[280px] text-xs leading-relaxed text-muted-foreground">
+                    The code is live — scan it with your phone.
+                </p>
             </div>
         </div>
     )

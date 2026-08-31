@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     description:
         "The application an agency's applicants fill in — digitals, measurements and contact details, on a phone, in a few minutes.",
     alternates: { canonical: "/apply" },
+    robots: { index: false, follow: true },
     openGraph: {
         title: "Become a model | scouting",
         description:
