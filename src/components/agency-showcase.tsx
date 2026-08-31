@@ -347,55 +347,112 @@ function FilterPanel() {
 
 const STAGE_COLUMNS = ["Pre-Select", "Scheduled", "Final Voting"] as const
 
+interface Move {
+    id: number
+    who: string
+    to: string
+}
+
 function StagesPanel() {
     const [placement, setPlacement] = useState<Record<string, number>>({
         a: 0, b: 0, c: 1, d: 1, e: 2, f: 0,
     })
     const [dragging, setDragging] = useState<string | null>(null)
+    const [log, setLog] = useState<Move[]>([])
 
     function move(id: string, column: number) {
+        if (placement[id] === column) return
+        const who = APPLICANTS.find((a) => a.id === id)?.name ?? ""
         setPlacement((prev) => ({ ...prev, [id]: column }))
+        setLog((prev) =>
+            [{ id: Date.now(), who, to: STAGE_COLUMNS[column] }, ...prev].slice(0, 4),
+        )
     }
 
     return (
-        <div>
-            <div className="grid grid-cols-3 gap-3">
-                {STAGE_COLUMNS.map((name, column) => (
-                    <div
-                        key={name}
-                        onDragOver={(e) => e.preventDefault()}
-                        onDrop={() => {
-                            if (dragging) move(dragging, column)
-                            setDragging(null)
-                        }}
-                        className="min-h-[220px] border border-dashed border-border p-2"
-                    >
-                        <p className="mb-2 text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">
-                            {name}
-                        </p>
-                        <div className="space-y-2">
-                            {APPLICANTS.filter((a) => placement[a.id] === column).map((a) => (
-                                <div
-                                    key={a.id}
-                                    draggable
-                                    onDragStart={() => setDragging(a.id)}
-                                    onDragEnd={() => setDragging(null)}
-                                    onClick={() =>
-                                        move(a.id, (placement[a.id] + 1) % STAGE_COLUMNS.length)
-                                    }
-                                    className="flex cursor-grab items-center gap-1.5 border border-border bg-background p-2 active:cursor-grabbing"
-                                >
-                                    <GripVertical className="h-3 w-3 shrink-0 text-muted-foreground" />
-                                    <span className="text-xs text-foreground">{a.name}</span>
+        <div className="grid gap-8 lg:grid-cols-[1fr_240px] lg:gap-10">
+            <div>
+                {/* Columns scroll rather than crush on a narrow screen */}
+                <div className="-mx-1 overflow-x-auto px-1 pb-1">
+                    <div className="grid min-w-[420px] grid-cols-3 gap-3">
+                        {STAGE_COLUMNS.map((name, column) => (
+                            <div
+                                key={name}
+                                onDragOver={(e) => e.preventDefault()}
+                                onDrop={() => {
+                                    if (dragging) move(dragging, column)
+                                    setDragging(null)
+                                }}
+                                className="min-h-[220px] border border-dashed border-border p-2"
+                            >
+                                <p className="mb-2 text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                                    {name}
+                                </p>
+                                <div className="space-y-2">
+                                    {APPLICANTS.filter(
+                                        (a) => placement[a.id] === column,
+                                    ).map((a) => (
+                                        <button
+                                            key={a.id}
+                                            type="button"
+                                            draggable
+                                            onDragStart={() => setDragging(a.id)}
+                                            onDragEnd={() => setDragging(null)}
+                                            onClick={() =>
+                                                move(
+                                                    a.id,
+                                                    (placement[a.id] + 1) %
+                                                        STAGE_COLUMNS.length,
+                                                )
+                                            }
+                                            className="flex w-full cursor-pointer items-center gap-1.5 border border-border bg-background p-2 text-left transition-colors hover:border-foreground/30"
+                                        >
+                                            <GripVertical className="h-3 w-3 shrink-0 text-muted-foreground" />
+                                            <span className="text-xs text-foreground">
+                                                {a.name}
+                                            </span>
+                                        </button>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
+                            </div>
+                        ))}
                     </div>
-                ))}
+                </div>
+                <p className="mt-4 text-xs text-muted-foreground">
+                    Tap a face to advance it, or drag it anywhere you like.
+                </p>
             </div>
-            <p className="mt-4 text-xs text-muted-foreground">
-                Drag a card between columns — or tap one to advance it.
-            </p>
+
+            {/* The move is the record */}
+            <div>
+                <p className="text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                    History
+                </p>
+                {log.length === 0 ? (
+                    <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+                        Move someone and it is written down here — every stage a
+                        face passes through, who moved them, and when.
+                    </p>
+                ) : (
+                    <ul className="mt-3 border-t border-border">
+                        {log.map((m) => (
+                            <li
+                                key={m.id}
+                                className="border-b border-border py-2 text-xs"
+                            >
+                                <span className="text-foreground">{m.who}</span>
+                                <span className="text-muted-foreground">
+                                    {" "}
+                                    &rarr; {m.to}
+                                </span>
+                                <span className="mt-0.5 block text-muted-foreground">
+                                    by you · just now
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
         </div>
     )
 }
