@@ -63,6 +63,11 @@ async function persist(
 ) {
   const submissionId = crypto.randomUUID();
 
+  // Straight to the agency when nobody referred it. Through a scout's link it
+  // waits for the scout: they send on what is worth the agency's time, and that
+  // choice is what their kept rate measures.
+  const sentAt = referrer ? null : new Date().toISOString();
+
   await Promise.all(
     agencies.map(
       (agency) => sql`
@@ -70,7 +75,7 @@ async function persist(
           submission_id, organization_id, scout_id,
           first_name, last_name, email, phone, dob, gender, city, country, instagram,
           height_cm, bust_cm, waist_cm, hips_cm, shoe_eu, hair_color, eye_color,
-          video_link, portfolio_link, notes
+          video_link, portfolio_link, notes, sent_at
         ) VALUES (
           ${submissionId}, ${agency.id}, ${referrer?.id ?? null},
           ${values.firstName}, ${values.lastName}, ${values.email}, ${values.phone},
@@ -80,7 +85,7 @@ async function persist(
           ${Number(values.hips)}, ${Number(values.shoeSize)},
           ${values.hairColor}, ${values.eyeColor},
           ${values.videoLink || null}, ${values.portfolioLink || null},
-          ${values.notes || null}
+          ${values.notes || null}, ${sentAt}
         )
       `
     )

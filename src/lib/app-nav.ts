@@ -25,7 +25,7 @@ export function agencySections(slug: string, admin = false): NavSection[] {
         {
             title: "Pipeline",
             items: [
-                { label: "Applications" },
+                { label: "Applications", href: `/agency/${slug}/applications` },
                 { label: "Castings" },
                 { label: "Final voting" },
                 { label: "Onboarding" },
@@ -67,7 +67,10 @@ export function scoutSections(admin = false): NavSection[] {
         },
         {
             title: "Scouting",
-            items: [{ label: "Applications" }, { label: "Card & QR" }],
+            items: [
+                { label: "Applications", href: "/scout/applications" },
+                { label: "Card & QR" },
+            ],
         },
         {
             title: "Credit",
