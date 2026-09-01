@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo } from "react"
 
 import { Control } from "@/components/applications/application-card"
 import type { ApplicationRow } from "@/lib/applications"
@@ -9,6 +9,7 @@ export interface Filters {
     minHeight: number
     maxAge: number
     minAge: number
+    maxBust: number
     maxWaist: number
     maxHips: number
     hair: string
@@ -23,6 +24,7 @@ export const EMPTY: Filters = {
     minHeight: 150,
     maxAge: 40,
     minAge: 14,
+    maxBust: 115,
     maxWaist: 110,
     maxHips: 120,
     hair: "Any",
@@ -34,52 +36,81 @@ export const EMPTY: Filters = {
 /**
  * Everything on the record, as one lowercase string.
  *
- * Search covers the whole application rather than a chosen few fields: someone
- * looking for "hazel", "vimeo", a phone number, a scout's name or a word from
- * what an applicant wrote should find it, and guessing which fields matter is
- * how a search box ends up feeling broken.
+ * Field names go in beside their values, so "waist 60" and "eyes green" find
+ * what you would expect — a number on its own is ambiguous across five
+ * measurements, and typing the label is the natural way to say which you meant.
  */
 function haystack(a: ApplicationRow): string {
-    return [
-        a.name,
-        a.firstName,
-        a.lastName,
-        a.email,
-        a.phone,
-        a.dob,
-        String(a.age),
-        a.gender,
-        a.city,
-        a.country,
-        a.instagram,
-        String(a.height),
-        String(a.bust),
-        String(a.waist),
-        String(a.hips),
-        String(a.shoe),
-        a.hair,
-        a.eyes,
-        a.videoLink,
-        a.portfolioLink,
-        a.notes,
-        a.scout,
-        a.scoutCode,
+    const pairs: [string, string | number | null][] = [
+        ["", a.name],
+        ["email", a.email],
+        ["phone", a.phone],
+        ["born", a.dob],
+        ["age", a.age],
+        ["gender", a.gender],
+        ["city", a.city],
+        ["country", a.country],
+        ["instagram", a.instagram],
+        ["height", a.height],
+        ["bust", a.bust],
+        ["waist", a.waist],
+        ["hips", a.hips],
+        ["shoe", a.shoe],
+        ["hair", a.hair],
+        ["eyes", a.eyes],
+        ["video", a.videoLink],
+        ["portfolio", a.portfolioLink],
+        ["notes", a.notes],
+        ["scout", a.scout],
+        ["scout", a.scoutCode],
     ]
-        .filter(Boolean)
+
+    return pairs
+        .filter(([, v]) => v !== null && v !== undefined && v !== "")
+        .map(([label, v]) => `${label} ${v}`)
         .join(" ")
         .toLowerCase()
 }
 
+/** Field names the search understands as "this label, this value". */
+const LABELS = [
+    "email", "phone", "born", "age", "gender", "city", "country", "instagram",
+    "height", "bust", "waist", "hips", "shoe", "hair", "eyes", "video",
+    "portfolio", "notes", "scout",
+]
+
+/**
+ * Split a query into things that must appear in the haystack.
+ *
+ * A label followed by anything binds to it, so "hips 60" asks for hips of 60
+ * and does not quietly match someone whose waist is 60 — matching the two words
+ * independently is how a search says yes to the wrong person.
+ */
+function requirements(query: string): string[] {
+    const tokens = query.trim().toLowerCase().split(/\s+/).filter(Boolean)
+    const out: string[] = []
+
+    for (let i = 0; i < tokens.length; i++) {
+        if (LABELS.includes(tokens[i]) && tokens[i + 1]) {
+            out.push(`${tokens[i]} ${tokens[i + 1]}`)
+            i++
+        } else {
+            out.push(tokens[i])
+        }
+    }
+
+    return out
+}
+
 export function applyFilters(rows: ApplicationRow[], f: Filters) {
-    // Every whitespace-separated term has to match somewhere, so "blonde
-    // berlin" narrows rather than widening.
-    const terms = f.query.trim().toLowerCase().split(/\s+/).filter(Boolean)
+    const needed = requirements(f.query)
 
     return rows.filter((a) => {
         if (
             a.height < f.minHeight ||
             a.age > f.maxAge ||
             a.age < f.minAge ||
+            a.bust > f.maxBust ||
             a.waist > f.maxWaist ||
             a.hips > f.maxHips ||
             (f.hair !== "Any" &&
@@ -90,9 +121,9 @@ export function applyFilters(rows: ApplicationRow[], f: Filters) {
             return false
         }
 
-        if (terms.length === 0) return true
+        if (needed.length === 0) return true
         const hay = haystack(a)
-        return terms.every((t) => hay.includes(t))
+        return needed.every((t) => hay.includes(t))
     })
 }
 
@@ -116,7 +147,6 @@ export function FilterColumn({
     onSelectAll: () => void
     allSelected: boolean
 }) {
-    const [open, setOpen] = useState(false)
     const set = <K extends keyof Filters>(key: K, v: Filters[K]) =>
         onChange({ ...value, [key]: v })
 
@@ -185,55 +215,50 @@ export function FilterColumn({
                 </div>
             </div>
 
-            {/* The rest is there when you want it and out of the way when you
-                do not — most triage never touches these. */}
-            <div className="border-t border-border pt-4">
-                <button
-                    type="button"
-                    onClick={() => setOpen(!open)}
-                    aria-expanded={open}
-                    className="text-xs uppercase tracking-[0.1em] text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
-                >
-                    {open ? "Fewer filters" : "More filters"}
-                </button>
+            {/* Measurements are the job, so they are all here rather than
+                behind a toggle — a filter you have to go looking for is one
+                nobody uses. */}
+            <Control
+                label="Bust up to"
+                value={value.maxBust}
+                min={65}
+                max={115}
+                suffix=" cm"
+                onChange={(v) => set("maxBust", v)}
+            />
+            <Control
+                label="Waist up to"
+                value={value.maxWaist}
+                min={45}
+                max={110}
+                suffix=" cm"
+                onChange={(v) => set("maxWaist", v)}
+            />
+            <Control
+                label="Hips up to"
+                value={value.maxHips}
+                min={65}
+                max={120}
+                suffix=" cm"
+                onChange={(v) => set("maxHips", v)}
+            />
 
-                {open && (
-                    <div className="mt-4 space-y-5">
-                        <Control
-                            label="Waist up to"
-                            value={value.maxWaist}
-                            min={45}
-                            max={110}
-                            suffix=" cm"
-                            onChange={(v) => set("maxWaist", v)}
-                        />
-                        <Control
-                            label="Hips up to"
-                            value={value.maxHips}
-                            min={65}
-                            max={120}
-                            suffix=" cm"
-                            onChange={(v) => set("maxHips", v)}
-                        />
-                        <label className="block">
-                            <span className="text-xs uppercase tracking-[0.1em] text-muted-foreground">
-                                Country
-                            </span>
-                            <select
-                                value={value.country}
-                                onChange={(e) => set("country", e.target.value)}
-                                className="mt-2 w-full appearance-none border-b border-border bg-transparent py-1.5 text-xs outline-none focus:border-foreground/30"
-                            >
-                                {countries.map((c) => (
-                                    <option key={c} value={c}>
-                                        {c}
-                                    </option>
-                                ))}
-                            </select>
-                        </label>
-                    </div>
-                )}
-            </div>
+            <label className="block">
+                <span className="text-xs uppercase tracking-[0.1em] text-muted-foreground">
+                    Country
+                </span>
+                <select
+                    value={value.country}
+                    onChange={(e) => set("country", e.target.value)}
+                    className="mt-2 w-full appearance-none border-b border-border bg-transparent py-1.5 text-xs outline-none focus:border-foreground/30"
+                >
+                    {countries.map((c) => (
+                        <option key={c} value={c}>
+                            {c}
+                        </option>
+                    ))}
+                </select>
+            </label>
 
             <label className="flex items-center gap-2.5">
                 <input
