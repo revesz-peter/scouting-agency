@@ -22,7 +22,7 @@ const HAIR = ["Any", "Blonde", "Brown", "Dark", "Red", "Black"]
 
 /**
  * Where the sliders start: roughly the bar a women's board actually works to,
- * around 88 / 60 / 92 and 170 up.
+ * around 88 / 62 / 92 and 170 up.
  *
  * This hides people on arrival, which is the point of a bar — but it is also
  * how someone misses an applicant, so the count says how many are out of view
@@ -33,7 +33,7 @@ export const DEFAULTS: Filters = {
     maxAge: 40,
     minAge: 14,
     maxBust: 88,
-    maxWaist: 60,
+    maxWaist: 62,
     maxHips: 92,
     hair: "Any",
     country: "Any",
