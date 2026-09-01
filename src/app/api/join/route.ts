@@ -19,13 +19,21 @@ export async function POST(request: Request) {
     }
 
     const slug = typeof body.slug === "string" ? body.slug.trim() : "";
+    // Only a confirmed agency takes scouts: the same gate the public page
+    // shows, enforced where it counts.
     const rows = await sql`
-      SELECT id FROM neon_auth.organization WHERE slug = ${slug}
+      SELECT o.id
+      FROM neon_auth.organization o
+      JOIN public.agency_profile p ON p.organization_id = o.id
+      WHERE o.slug = ${slug} AND p.status = 'active'
     `;
     const agency = rows[0] as { id: string } | undefined;
 
     if (!agency) {
-      return NextResponse.json({ error: "Unknown agency" }, { status: 404 });
+      return NextResponse.json(
+        { error: "That agency isn't taking scouts yet." },
+        { status: 404 }
+      );
     }
 
     const { name, email, city, country, instagram, message } = parsed.data;

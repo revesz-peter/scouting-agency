@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 
 import { AppShell } from "@/components/app/app-shell"
 import { scoutSections, toWorkspaces } from "@/lib/app-nav"
+import { getAdmin } from "@/lib/auth/admin"
 import {
     getMemberships,
     getScoutProfile,
@@ -23,9 +24,10 @@ export default async function ScoutLayout({
     const user = await getUser()
     if (!user) redirect("/agency/sign-in")
 
-    const [memberships, scout] = await Promise.all([
+    const [memberships, scout, admin] = await Promise.all([
         getMemberships(user.id),
         getScoutProfile(user.id),
+        getAdmin(),
     ])
 
     if (memberships.length === 0) {
@@ -34,7 +36,7 @@ export default async function ScoutLayout({
 
     return (
         <AppShell
-            sections={scoutSections()}
+            sections={scoutSections(Boolean(admin))}
             workspaces={toWorkspaces(memberships)}
             current={memberships[0].slug}
             email={user.email}

@@ -141,9 +141,10 @@ export async function POST(request: Request) {
 
     const agencies = slugs.length
       ? ((await sql`
-          SELECT id, slug, name
-          FROM neon_auth.organization
-          WHERE slug = ANY(${slugs})
+          SELECT o.id, o.slug, o.name
+          FROM neon_auth.organization o
+          JOIN public.agency_profile p ON p.organization_id = o.id
+          WHERE o.slug = ANY(${slugs}) AND p.status = 'active' 
         `) as AgencyRow[])
       : [];
 
@@ -166,7 +167,7 @@ export async function POST(request: Request) {
     // applicant is told it went through and it is stored nowhere.
     if (agencies.length === 0) {
       return NextResponse.json(
-        { error: "That agency isn't taking applications here." },
+        { error: "That agency isn't taking applications yet." },
         { status: 404 }
       );
     }

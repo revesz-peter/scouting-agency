@@ -9,8 +9,8 @@ import type { Membership } from "@/lib/auth/membership"
  * where someone learns the shape of the thing — but they stay unlinked until
  * they exist.
  */
-export function agencySections(slug: string): NavSection[] {
-    return [
+export function agencySections(slug: string, admin = false): NavSection[] {
+    const sections: NavSection[] = [
         {
             title: "Pipeline",
             items: [
@@ -29,10 +29,21 @@ export function agencySections(slug: string): NavSection[] {
             ],
         },
     ]
+
+    // Only the operator sees this, and only because the panel itself checks
+    // again — hiding a link is not access control.
+    if (admin) {
+        sections.push({
+            title: "Platform",
+            items: [{ label: "Agencies", href: "/admin" }],
+        })
+    }
+
+    return sections
 }
 
-export function scoutSections(): NavSection[] {
-    return [
+export function scoutSections(admin = false): NavSection[] {
+    const sections: NavSection[] = [
         {
             title: "Scouting",
             items: [
@@ -46,6 +57,15 @@ export function scoutSections(): NavSection[] {
             items: [{ label: "Payouts" }],
         },
     ]
+
+    if (admin) {
+        sections.push({
+            title: "Platform",
+            items: [{ label: "Agencies", href: "/admin" }],
+        })
+    }
+
+    return sections
 }
 
 /** Every agency this person belongs to, for the switcher. */

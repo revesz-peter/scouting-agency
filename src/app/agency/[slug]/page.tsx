@@ -30,7 +30,12 @@ export default async function AgencyOverview({
     const { slug } = await params
     const { membership } = await requireAgency(slug)
 
-    const [counts, waiting] = await Promise.all([
+    const [profile, counts, waiting] = await Promise.all([
+        sql`
+            SELECT status
+            FROM public.agency_profile
+            WHERE organization_id = ${membership.organizationId}
+        `,
         sql`
             SELECT stage, count(*)::int AS n
             FROM public.application
@@ -50,6 +55,8 @@ export default async function AgencyOverview({
     )
     const total = [...byStage.values()].reduce((sum, n) => sum + n, 0)
     const pendingScouts = (waiting[0] as { n: number }).n
+    const status = (profile[0] as { status: string } | undefined)?.status
+    const live = status === "active"
 
     return (
         <>
@@ -67,12 +74,33 @@ export default async function AgencyOverview({
                 <h2 className="text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">
                     Your links
                 </h2>
+
+                {!live && (
+                    <div className="mt-4 border-l-2 border-foreground pl-4">
+                        <p className="text-xs font-medium uppercase tracking-[0.1em] text-foreground">
+                            {status === "suspended"
+                                ? "Your links are down"
+                                : "Not live yet"}
+                        </p>
+                        <p className="mt-2 max-w-prose text-xs leading-relaxed text-muted-foreground">
+                            {status === "suspended"
+                                ? "These links are switched off. Everything you have collected is untouched."
+                                : "We check every agency by hand before its links go live, so applicants know who they are writing to. Yours are below and will start working once that is done — usually within a couple of days. Nothing else here is waiting on it."}
+                        </p>
+                    </div>
+                )}
+
                 <dl className="mt-4 space-y-4">
                     <LinkRow
                         label="Applicants apply here"
                         path={`/apply/${slug}`}
+                        live={live}
                     />
-                    <LinkRow label="Scouts join here" path={`/join/${slug}`} />
+                    <LinkRow
+                        label="Scouts join here"
+                        path={`/join/${slug}`}
+                        live={live}
+                    />
                 </dl>
             </section>
 
@@ -113,17 +141,36 @@ export default async function AgencyOverview({
     )
 }
 
-function LinkRow({ label, path }: { label: string; path: string }) {
+function LinkRow({
+    label,
+    path,
+    live,
+}: {
+    label: string
+    path: string
+    live: boolean
+}) {
     return (
         <div>
             <dt className="text-xs uppercase tracking-[0.1em] text-muted-foreground">
                 {label}
             </dt>
             <dd className="mt-1 flex items-center gap-2">
-                <span className="min-w-0 truncate text-sm text-foreground">
+                {/* Shown either way — knowing the link is worth something before
+                    it works — but muted and uncopyable until it does, so it is
+                    not handed out while it would only disappoint. */}
+                <span
+                    className={`min-w-0 truncate text-sm ${
+                        live
+                            ? "text-foreground"
+                            : "text-muted-foreground/50 line-through"
+                    }`}
+                >
                     {siteLink(path)}
                 </span>
-                <CopyButton value={siteUrl(path)} label={`Copy ${label}`} />
+                {live && (
+                    <CopyButton value={siteUrl(path)} label={`Copy ${label}`} />
+                )}
             </dd>
         </div>
     )

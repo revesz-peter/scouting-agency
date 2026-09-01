@@ -30,6 +30,8 @@ export interface Workspace {
 export interface ShareLink {
     label: string
     path: string
+    /** A link that does not work yet is shown, but not offered for copying. */
+    live?: boolean
 }
 
 /**
@@ -96,14 +98,27 @@ export function AppNav({
                             {/* Short form: the host is the same for everyone and
                                 would only crowd a narrow column. Copying still
                                 gives the whole URL. */}
-                            <span className="min-w-0 truncate text-sm text-foreground">
+                            <span
+                                className={`min-w-0 truncate text-sm ${
+                                    link.live === false
+                                        ? "text-muted-foreground/50 line-through"
+                                        : "text-foreground"
+                                }`}
+                            >
                                 {link.path}
                             </span>
-                            <CopyButton
-                                value={siteUrl(link.path)}
-                                label={`Copy ${link.label.toLowerCase()}`}
-                            />
+                            {link.live !== false && (
+                                <CopyButton
+                                    value={siteUrl(link.path)}
+                                    label={`Copy ${link.label.toLowerCase()}`}
+                                />
+                            )}
                         </div>
+                        {link.live === false && (
+                            <p className="mt-1 text-xs text-muted-foreground/70">
+                                Not live yet
+                            </p>
+                        )}
                     </div>
                 )}
 

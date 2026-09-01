@@ -163,7 +163,7 @@ export function AgencyRegisterForm() {
 
                     <div className="grid grid-cols-2 gap-3">
                         <Field
-                            label="Email"
+                            label="Work email"
                             required
                             error={errors.email?.message}
                         >
@@ -199,10 +199,12 @@ export function AgencyRegisterForm() {
                         />
                         <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
                             At least {MIN_PASSWORD} characters. We email a
-                            six-digit code to the address above and you cannot
-                            get in without it — that check is how an agency
-                            proves the address is really theirs, so applicants
-                            and scouts know who they are sending to.
+                            six-digit code to your work address and you cannot
+                            get in without it. We then check the agency by hand
+                            before your links go live — applicants need to know
+                            who they are sending their photos to. Use an address
+                            at the agency&apos;s own domain if you have one; it
+                            makes that check quick.
                         </p>
                     </Field>
 

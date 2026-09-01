@@ -10,13 +10,19 @@ export const dynamic = "force-dynamic"
 
 async function getAgencyBySlug(slug: string) {
     const rows = await sql`
-        SELECT o.name, o.slug, p.city, p.country
+        SELECT o.name, o.slug, p.city, p.country, p.status = 'active' AS live
         FROM neon_auth.organization o
         LEFT JOIN public.agency_profile p ON p.organization_id = o.id
         WHERE o.slug = ${slug}
     `
     return rows[0] as
-        | { name: string; slug: string; city: string | null; country: string | null }
+        | {
+              name: string
+              slug: string
+              city: string | null
+              country: string | null
+              live: boolean
+          }
         | undefined
 }
 
@@ -61,7 +67,14 @@ export default async function Join({ params }: PageProps<"/join/[slug]">) {
                     vote, and signing.
                 </p>
 
-                <JoinForm slug={agency.slug} agency={agency.name} />
+                {agency.live ? (
+                    <JoinForm slug={agency.slug} agency={agency.name} />
+                ) : (
+                    <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
+                        This agency is still being set up and is not taking scouts
+                        through this link yet. Worth trying again shortly.
+                    </p>
+                )}
             </main>
             <SiteFooter />
         </div>

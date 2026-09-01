@@ -36,6 +36,30 @@ export default async function AgencyApply(props: PageProps<"/apply/[agency]">) {
     const agency = await getAgency(slug)
     if (!agency) notFound()
 
+    // The agency exists but is not confirmed. Say so rather than 404: the link
+    // is real, its owner is handing it out, and it will start working.
+    if (!agency.live) {
+        return (
+            <div className="flex min-h-svh flex-col">
+                <SiteHeader />
+                <main className="mx-auto w-full max-w-sm flex-1 px-6 py-14 sm:py-20">
+                    <p className="text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
+                        {agency.name}
+                    </p>
+                    <h1 className="mt-4 text-2xl leading-[1.15] text-foreground sm:text-3xl font-[family-name:var(--font-libre)]">
+                        Not open yet.
+                    </h1>
+                    <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+                        This agency is still being set up, so it is not taking
+                        applications through this link yet. It is worth trying
+                        again shortly.
+                    </p>
+                </main>
+                <SiteFooter />
+            </div>
+        )
+    }
+
     return (
         <div className="flex min-h-svh flex-col">
             <SiteHeader />
