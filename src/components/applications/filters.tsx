@@ -20,18 +20,41 @@ export interface Filters {
 
 const HAIR = ["Any", "Blonde", "Brown", "Dark", "Red", "Black"]
 
-export const EMPTY: Filters = {
-    minHeight: 150,
+/**
+ * Where the sliders start: roughly the bar a women's board actually works to,
+ * around 88 / 60 / 92 and 170 up.
+ *
+ * This hides people on arrival, which is the point of a bar — but it is also
+ * how someone misses an applicant, so the count says how many are out of view
+ * and one click widens everything.
+ */
+export const DEFAULTS: Filters = {
+    minHeight: 170,
     maxAge: 40,
     minAge: 14,
-    maxBust: 115,
-    maxWaist: 110,
-    maxHips: 120,
+    maxBust: 88,
+    maxWaist: 60,
+    maxHips: 92,
     hair: "Any",
     country: "Any",
     recent: false,
     query: "",
 }
+
+/** Every slider at its limit: nobody is filtered out. */
+export const WIDE: Filters = {
+    ...DEFAULTS,
+    minHeight: 150,
+    maxBust: 115,
+    maxWaist: 110,
+    maxHips: 120,
+}
+
+/**
+ * Age is deliberately wide in both. A board has a view on measurements; a
+ * default that quietly buried applicants by age would be a different kind of
+ * decision, and not one a slider should make on an agency's behalf.
+ */
 
 /**
  * Everything on the record, as one lowercase string.
@@ -157,7 +180,8 @@ export function FilterColumn({
         [rows],
     )
 
-    const dirty = JSON.stringify(value) !== JSON.stringify(EMPTY)
+    const wideOpen = JSON.stringify(value) === JSON.stringify(WIDE)
+    const hidden = rows.length - matches
 
     return (
         <div className="space-y-5">
@@ -277,6 +301,13 @@ export function FilterColumn({
                     <span className="text-foreground">{matches}</span> of{" "}
                     {rows.length} match
                 </p>
+                {/* The bar hides people by design; saying how many keeps that
+                    from being a surprise. */}
+                {hidden > 0 && (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                        {hidden} below the bar
+                    </p>
+                )}
                 <button
                     type="button"
                     onClick={onSelectAll}
@@ -285,15 +316,13 @@ export function FilterColumn({
                 >
                     {allSelected ? "Clear selection" : "Select all matching"}
                 </button>
-                {dirty && (
-                    <button
-                        type="button"
-                        onClick={() => onChange(EMPTY)}
-                        className="mt-1.5 block text-xs text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
-                    >
-                        Reset filters
-                    </button>
-                )}
+                <button
+                    type="button"
+                    onClick={() => onChange(wideOpen ? DEFAULTS : WIDE)}
+                    className="mt-1.5 block text-xs text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+                >
+                    {wideOpen ? "Back to the usual bar" : "Show everyone"}
+                </button>
             </div>
         </div>
     )

@@ -12,7 +12,7 @@ import {
 } from "@/components/applications/application-card"
 import {
     applyFilters,
-    EMPTY,
+    DEFAULTS,
     FilterColumn,
     type Filters,
 } from "@/components/applications/filters"
@@ -34,7 +34,7 @@ export function ApplicationsBoard({
 }) {
     const router = useRouter()
 
-    const [filters, setFilters] = useState<Filters>(EMPTY)
+    const [filters, setFilters] = useState<Filters>(DEFAULTS)
     const [sort, setSort] = useState<SortKey>("applied")
     const [picked, setPicked] = useState<string[]>([])
     const [moved, setMoved] = useState(0)
