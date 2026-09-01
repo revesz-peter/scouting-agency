@@ -2,107 +2,63 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useForm } from "react-hook-form"
+import { useRouter } from "next/navigation"
+import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { motion } from "framer-motion"
-import { Loader2, Check } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { Field, fieldClass } from "@/components/form-field"
 import { COUNTRIES } from "@/lib/application-options"
-
-/** Slugs the platform needs for its own routes. */
-const RESERVED_SLUGS = [
-    "admin",
-    "agency",
-    "api",
-    "apply",
-    "l",
-    "privacy",
-    "s",
-    "scouting",
-    "sign-in",
-    "terms",
-    "www",
-]
-
-const registrationSchema = z.object({
-    agencyName: z.string().trim().min(1, "Required"),
-    website: z
-        .string()
-        .trim()
-        .optional()
-        .refine(
-            (v) => !v || /^https?:\/\/.+\..+/.test(v),
-            "Enter a full link starting with http",
-        ),
-    slug: z
-        .string()
-        .trim()
-        .toLowerCase()
-        .min(2, "At least 2 characters")
-        .max(32, "Keep it under 32 characters")
-        .refine(
-            (v) => /^[a-z0-9-]+$/.test(v),
-            "Lowercase letters, numbers and dashes only",
-        )
-        .refine((v) => !v.startsWith("-") && !v.endsWith("-"), "No leading or trailing dash")
-        .refine((v) => !RESERVED_SLUGS.includes(v), "That one is reserved"),
-    contactName: z.string().trim().min(1, "Required"),
-    role: z.string().trim().optional(),
-    email: z.string().email("Enter a valid email"),
-    phone: z.string().trim().optional(),
-    city: z.string().trim().min(1, "Required"),
-    country: z
-        .string()
-        .trim()
-        .min(1, "Required")
-        .refine((v) => COUNTRIES.includes(v), "Pick a country from the list"),
-    boardSize: z
-        .string()
-        .trim()
-        .optional()
-        .refine((v) => !v || /^\d+$/.test(v), "Enter a number"),
-    notes: z.string().trim().max(2000, "Keep it under 2000 characters").optional(),
-    consent: z.literal(true, { error: "You must agree to continue" }),
-})
-
-type RegistrationData = z.infer<typeof registrationSchema>
+import {
+    agencySignupSchema,
+    MIN_PASSWORD,
+    type AgencySignupData,
+} from "@/lib/schemas/agency-signup"
 
 export function AgencyRegisterForm() {
+    const router = useRouter()
     const {
         register,
         handleSubmit,
-        watch,
+        control,
+        setError,
         formState: { errors, isSubmitting },
-    } = useForm<RegistrationData>({
-        resolver: zodResolver(registrationSchema),
+    } = useForm<AgencySignupData>({
+        resolver: zodResolver(agencySignupSchema),
         mode: "onBlur",
     })
 
-    const [submitted, setSubmitted] = useState(false)
     const [submitError, setSubmitError] = useState("")
-    const slug = watch("slug")
+    const slug = useWatch({ control, name: "slug" })
 
-    async function onSubmit(data: RegistrationData) {
+    async function onSubmit(data: AgencySignupData) {
         setSubmitError("")
-        const formData = new FormData()
-        Object.entries(data).forEach(([key, val]) => {
-            if (val !== undefined && val !== null && key !== "consent") {
-                formData.append(key, String(val))
-            }
-        })
 
         try {
             const controller = new AbortController()
             const timeout = setTimeout(() => controller.abort(), 15000)
             const res = await fetch("/api/agency-register", {
                 method: "POST",
-                body: formData,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
                 signal: controller.signal,
             })
             clearTimeout(timeout)
-            if (!res.ok) throw new Error()
-            setSubmitted(true)
+
+            const body = await res.json().catch(() => ({}))
+
+            if (!res.ok) {
+                // Put the message on the field it belongs to when the server
+                // says which one — the slug and email are the ones that clash.
+                if (body.field === "slug" || body.field === "email") {
+                    setError(body.field, { message: body.error })
+                } else {
+                    setSubmitError(body.error ?? "Something went wrong.")
+                }
+                return
+            }
+
+            // The code is already on its way; verifying signs them in.
+            router.push(`/auth/verify?email=${encodeURIComponent(data.email)}`)
         } catch (err) {
             if (err instanceof DOMException && err.name === "AbortError") {
                 setSubmitError(
@@ -116,38 +72,6 @@ export function AgencyRegisterForm() {
         }
     }
 
-    if (submitted) {
-        return (
-            <div className="order-1 flex items-center px-6 py-14 sm:px-10 sm:py-20 lg:order-2 lg:px-14">
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="mx-auto w-full max-w-sm lg:ml-0 lg:mr-auto"
-                >
-                    <div className="mb-5 flex h-8 w-8 items-center justify-center border border-foreground">
-                        <Check
-                            className="h-3.5 w-3.5 text-foreground"
-                            strokeWidth={2.5}
-                        />
-                    </div>
-                    <p className="text-xs font-medium uppercase tracking-[0.15em]">
-                        Request received
-                    </p>
-                    <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                        We onboard agencies one at a time, so someone reads this
-                        properly. Expect a reply within a couple of days.
-                    </p>
-                    <Link
-                        href="/"
-                        className="mt-6 inline-block text-xs text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
-                    >
-                        Back to the site
-                    </Link>
-                </motion.div>
-            </div>
-        )
-    }
-
     return (
         <div className="order-1 px-6 py-14 sm:px-10 sm:py-20 lg:order-2 lg:px-14">
             <div className="mx-auto w-full max-w-sm lg:ml-0 lg:mr-auto">
@@ -155,11 +79,12 @@ export function AgencyRegisterForm() {
                     Agency
                 </p>
                 <h1 className="mt-4 text-2xl leading-[1.15] text-foreground sm:text-3xl font-[family-name:var(--font-libre)]">
-                    Request an account.
+                    Create your agency.
                 </h1>
                 <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-                    Onboarding is invite-only for now. Tell us about the agency
-                    and we&apos;ll set it up with you.
+                    Tell us about the agency and pick a password. We email a
+                    six-digit code to confirm the address, and your apply link
+                    works the moment you&apos;re in.
                 </p>
 
                 <form
@@ -260,6 +185,24 @@ export function AgencyRegisterForm() {
                         </Field>
                     </div>
 
+                    <Field
+                        label="Password"
+                        required
+                        error={errors.password?.message}
+                    >
+                        <input
+                            {...register("password")}
+                            type="password"
+                            className={fieldClass(errors.password)}
+                            autoComplete="new-password"
+                            aria-required="true"
+                        />
+                        <p className="mt-1.5 text-xs text-muted-foreground">
+                            At least {MIN_PASSWORD} characters. We email a code to
+                            confirm the address.
+                        </p>
+                    </Field>
+
                     <div className="grid grid-cols-2 gap-3">
                         <Field
                             label="City"
@@ -359,7 +302,7 @@ export function AgencyRegisterForm() {
                         {isSubmitting ? (
                             <Loader2 className="mx-auto h-4 w-4 animate-spin" />
                         ) : (
-                            "Request an account →"
+                            "Create the agency →"
                         )}
                     </button>
                 </form>

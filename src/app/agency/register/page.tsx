@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 
 export const metadata: Metadata = {
-    title: "Request an agency account",
+    title: "Create your agency",
     description:
         "Put your agency's new-faces pipeline on scouting. €150 a month, everything included.",
     robots: { index: false, follow: false },

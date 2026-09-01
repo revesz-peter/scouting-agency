@@ -1,24 +1,22 @@
 import { Suspense } from "react"
 import type { Metadata } from "next"
-import { AgencySignInForm } from "@/components/auth/sign-in-form"
-import { AgencyPanel } from "@/components/agency-panel"
+
+import { VerifyForm } from "@/components/auth/verify-form"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 
 export const metadata: Metadata = {
-    title: "Agency sign in",
-    description: "Sign in to your agency workspace.",
+    title: "Verify your email",
     robots: { index: false, follow: false },
 }
 
-export default function SignIn() {
+export default function Verify() {
     return (
         <div className="flex min-h-svh flex-col">
             <SiteHeader />
-            <main className="grid flex-1 lg:grid-cols-2">
-                <AgencyPanel />
+            <main className="flex-1">
                 <Suspense>
-                    <AgencySignInForm />
+                    <VerifyForm />
                 </Suspense>
             </main>
             <SiteFooter />
