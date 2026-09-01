@@ -101,10 +101,10 @@ export function AppNav({
                     {sections.map((section) => (
                         <div
                             key={section.title || "unlabelled"}
-                            // An untitled block sits apart under a rule, for the
-                            // things you reach for occasionally.
+                            // The untitled block is home, set off from the
+                            // titled groups of work below it by a rule.
                             className={
-                                section.title ? "" : "border-t border-border pt-6"
+                                section.title ? "" : "border-t border-border pt-5"
                             }
                         >
                             {section.title && (
@@ -248,23 +248,16 @@ function WorkspaceSwitcher({
     const router = useRouter()
     const active = workspaces.find((w) => w.slug === current) ?? workspaces[0]
 
+    // No "Agency" label on either: the name is self-evident, and a section
+    // called Agency used to sit right beneath this one saying something else.
     if (workspaces.length === 1) {
-        return (
-            <div>
-                <p className="text-xs font-medium uppercase tracking-[0.15em] text-muted-foreground/70">
-                    Agency
-                </p>
-                <p className="mt-1 text-sm text-foreground">{active.name}</p>
-            </div>
-        )
+        return <p className="text-sm text-foreground">{active.name}</p>
     }
 
     return (
         <div>
-            <label className="text-xs font-medium uppercase tracking-[0.15em] text-muted-foreground/70">
-                Agency
-            </label>
             <select
+                aria-label="Agency"
                 value={active.slug}
                 onChange={(e) => {
                     const next = workspaces.find((w) => w.slug === e.target.value)

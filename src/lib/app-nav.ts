@@ -5,27 +5,37 @@ import type { Membership } from "@/lib/auth/membership"
  * What the app is made of, in the vocabulary the product already uses: the six
  * stages, the board, castings, credit and payouts.
  *
+ * The column reads home, then work, then settings — the two untitled blocks
+ * bookending the titled ones.
+ *
  * Items without an href are planned. Naming them is worth it — the sidebar is
  * where someone learns the shape of the thing — but they stay unlinked until
  * they exist.
  */
 export function agencySections(slug: string, admin = false): NavSection[] {
     const sections: NavSection[] = [
+        // Home stands on its own: it summarises the pipeline rather than being
+        // a step in it.
+        {
+            title: "",
+            items: [{ label: "Overview", href: `/agency/${slug}` }],
+        },
+        // All six stages, in the order STAGES declares them. The board is where
+        // the pipeline ends, so it belongs here and not in a group of its own.
         {
             title: "Pipeline",
             items: [
-                { label: "Overview", href: `/agency/${slug}` },
                 { label: "Applications" },
                 { label: "Castings" },
                 { label: "Final voting" },
+                { label: "Onboarding" },
+                { label: "The board" },
             ],
         },
+        // Not "Agency": the switcher above already says which agency this is.
         {
-            title: "Agency",
-            items: [
-                { label: "The board" },
-                { label: "Scouts", href: `/agency/${slug}/scouts` },
-            ],
+            title: "People",
+            items: [{ label: "Scouts", href: `/agency/${slug}/scouts` }],
         },
     ]
 
@@ -52,12 +62,12 @@ export function agencySettingsHref(slug: string): string {
 export function scoutSections(admin = false): NavSection[] {
     const sections: NavSection[] = [
         {
+            title: "",
+            items: [{ label: "Workspace", href: "/scout" }],
+        },
+        {
             title: "Scouting",
-            items: [
-                { label: "Workspace", href: "/scout" },
-                { label: "Applications" },
-                { label: "Card & QR" },
-            ],
+            items: [{ label: "Applications" }, { label: "Card & QR" }],
         },
         {
             title: "Credit",
