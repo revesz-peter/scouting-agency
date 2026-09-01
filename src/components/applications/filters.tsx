@@ -162,6 +162,7 @@ export function FilterColumn({
     matches,
     onSelectAll,
     allSelected,
+    selectable = true,
 }: {
     rows: ApplicationRow[]
     value: Filters
@@ -169,6 +170,8 @@ export function FilterColumn({
     matches: number
     onSelectAll: () => void
     allSelected: boolean
+    /** Some lists are for reading, so there is nothing to select. */
+    selectable?: boolean
 }) {
     const set = <K extends keyof Filters>(key: K, v: Filters[K]) =>
         onChange({ ...value, [key]: v })
@@ -308,14 +311,16 @@ export function FilterColumn({
                         {hidden} below the bar
                     </p>
                 )}
-                <button
-                    type="button"
-                    onClick={onSelectAll}
-                    disabled={matches === 0}
-                    className="mt-2 block text-xs text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground disabled:opacity-40"
-                >
-                    {allSelected ? "Clear selection" : "Select all matching"}
-                </button>
+                {selectable && (
+                    <button
+                        type="button"
+                        onClick={onSelectAll}
+                        disabled={matches === 0}
+                        className="mt-2 block text-xs text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground disabled:opacity-40"
+                    >
+                        {allSelected ? "Clear selection" : "Select all matching"}
+                    </button>
+                )}
                 <button
                     type="button"
                     onClick={() => onChange(wideOpen ? DEFAULTS : WIDE)}

@@ -95,6 +95,30 @@ export async function scoutQueue(scoutId: string): Promise<ApplicationRow[]> {
     return rows as ApplicationRow[]
 }
 
+/**
+ * Everything a scout has sent on, with where it got to.
+ *
+ * A scout's funnel says how many they passed on; without this they could not
+ * see who those people were or what happened next — and what happened next is
+ * exactly what their kept rate is made of.
+ */
+export async function scoutSent(scoutId: string): Promise<SentApplication[]> {
+    const rows = await sql`
+        SELECT ${FIELDS}, a.stage, o.name AS agency
+        FROM public.application a
+        LEFT JOIN public.scout_profile s ON s.id = a.scout_id
+        JOIN neon_auth.organization o ON o.id = a.organization_id
+        WHERE a.scout_id = ${scoutId} AND a.sent_at IS NOT NULL
+        ORDER BY a.sent_at DESC
+    `
+    return rows as SentApplication[]
+}
+
+export interface SentApplication extends ApplicationRow {
+    stage: string
+    agency: string
+}
+
 /** Applied and sent on, for the scout's funnel. */
 export async function scoutFunnel(scoutId: string) {
     const rows = await sql`

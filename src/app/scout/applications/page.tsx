@@ -1,8 +1,9 @@
 import type { Metadata } from "next"
 
 import { ScoutFunnel, ScoutQueue } from "@/components/scout/scout-queue"
+import { ScoutSent } from "@/components/scout/scout-sent"
 import { requireMember } from "@/lib/auth/membership"
-import { scoutFunnel, scoutQueue } from "@/lib/applications"
+import { scoutFunnel, scoutQueue, scoutSent } from "@/lib/applications"
 import { redirect } from "next/navigation"
 
 export const dynamic = "force-dynamic"
@@ -18,8 +19,9 @@ export default async function ScoutApplications() {
     // No link means nothing can have come through it yet.
     if (!scout) redirect("/scout")
 
-    const [waiting, funnel] = await Promise.all([
+    const [waiting, sent, funnel] = await Promise.all([
         scoutQueue(scout.id),
+        scoutSent(scout.id),
         scoutFunnel(scout.id),
     ])
 
@@ -32,13 +34,14 @@ export default async function ScoutApplications() {
                 Applications.
             </h1>
             <p className="mt-4 max-w-prose text-xs leading-relaxed text-muted-foreground">
-                Everyone who applied through your link, and how many you passed
-                on. What you send lands in the agency&apos;s first column with
-                your name on it.
+                Everyone who applied through your link. What you send lands in
+                the agency&apos;s first column with your name on it, and stays
+                here afterwards so you can see how far they got.
             </p>
 
             <ScoutFunnel applied={funnel.applied} sent={funnel.sent} />
             <ScoutQueue waiting={waiting} />
+            <ScoutSent sent={sent} />
         </>
     )
 }

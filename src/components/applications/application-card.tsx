@@ -40,6 +40,8 @@ export function ApplicationCard({
     onSelect,
     showScout,
     href,
+    badge,
+    selectable = true,
 }: {
     row: ApplicationRow
     selected: boolean
@@ -47,6 +49,10 @@ export function ApplicationCard({
     showScout?: boolean
     /** The full profile for this person, when the viewer can reach one. */
     href?: string
+    /** Where they got to — what a scout wants to know about someone they sent. */
+    badge?: string
+    /** Some lists are for reading, not picking. */
+    selectable?: boolean
 }) {
     return (
         <div
@@ -57,24 +63,27 @@ export function ApplicationCard({
             <button
                 type="button"
                 onClick={onSelect}
-                aria-pressed={selected}
-                aria-label={`Select ${row.name}`}
+                aria-pressed={selectable ? selected : undefined}
+                aria-label={selectable ? `Select ${row.name}` : row.name}
+                disabled={!selectable}
                 className="relative block w-full text-left"
             >
-                <span
-                    className={`absolute right-1 top-1 flex h-4 w-4 items-center justify-center border ${
-                        selected
-                            ? "border-foreground bg-foreground"
-                            : "border-border bg-background/80"
-                    }`}
-                >
-                    {selected && (
-                        <Check
-                            className="h-2.5 w-2.5 text-background"
-                            strokeWidth={3}
-                        />
-                    )}
-                </span>
+                {selectable && (
+                    <span
+                        className={`absolute right-1 top-1 flex h-4 w-4 items-center justify-center border ${
+                            selected
+                                ? "border-foreground bg-foreground"
+                                : "border-border bg-background/80"
+                        }`}
+                    >
+                        {selected && (
+                            <Check
+                                className="h-2.5 w-2.5 text-background"
+                                strokeWidth={3}
+                            />
+                        )}
+                    </span>
+                )}
                 <span className="mb-2 flex aspect-4/5 items-end bg-black/[0.04] p-2">
                     <span className="text-xs text-foreground/25 font-[family-name:var(--font-libre)]">
                         {row.name.charAt(0)}
@@ -92,6 +101,11 @@ export function ApplicationCard({
                 {showScout && row.scout && (
                     <span className="mt-1 block truncate text-xs text-muted-foreground/70">
                         via {row.scout}
+                    </span>
+                )}
+                {badge && (
+                    <span className="mt-1.5 inline-block border border-border px-1.5 py-0.5 text-[10px] uppercase tracking-[0.1em] text-muted-foreground">
+                        {badge}
                     </span>
                 )}
             </button>
@@ -151,12 +165,16 @@ export function ApplicationGrid({
     onToggle,
     showScout,
     hrefFor,
+    badgeFor,
+    selectable = true,
 }: {
     rows: ApplicationRow[]
     selected: string[]
     onToggle: (id: string) => void
     showScout?: boolean
     hrefFor?: (id: string) => string
+    badgeFor?: (row: ApplicationRow) => string | undefined
+    selectable?: boolean
 }) {
     return rows.length === 0 ? null : (
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -168,6 +186,8 @@ export function ApplicationGrid({
                     onSelect={() => onToggle(r.id)}
                     showScout={showScout}
                     href={hrefFor?.(r.id)}
+                    badge={badgeFor?.(r)}
+                    selectable={selectable}
                 />
             ))}
         </div>
