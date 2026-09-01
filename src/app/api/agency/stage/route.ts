@@ -54,6 +54,15 @@ export async function POST(request: Request) {
       RETURNING id
     `;
 
+    if (moved.length > 0) {
+      await sql`
+        INSERT INTO public.application_event
+          (application_id, kind, stage, actor_id)
+        SELECT unnest(${moved.map((r) => (r as { id: string }).id)}::uuid[]),
+               'stage', ${stage}, ${user.id}
+      `;
+    }
+
     return NextResponse.json({ success: true, moved: moved.length });
   } catch (error) {
     console.error("Stage move error:", error);

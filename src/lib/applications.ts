@@ -106,3 +106,54 @@ export async function scoutFunnel(scoutId: string) {
     `
     return rows[0] as { applied: number; sent: number }
 }
+
+export interface ApplicationEvent {
+    kind: "applied" | "sent_on" | "stage"
+    stage: string | null
+    at: string
+    actor: string | null
+}
+
+export interface ApplicationProfile extends ApplicationRow {
+    organizationId: string
+    agency: string
+    agencySlug: string
+    stage: string
+    sent: boolean
+    events: ApplicationEvent[]
+}
+
+/**
+ * One applicant in full, with the record of how they got here.
+ *
+ * Not scoped to a viewer: callers check who is allowed to see it, because an
+ * agency and the scout who sent them reach the same person by different routes.
+ */
+export async function getApplication(
+    id: string,
+): Promise<ApplicationProfile | null> {
+    const rows = await sql`
+        SELECT ${FIELDS},
+            a.organization_id AS "organizationId",
+            a.stage,
+            a.sent_at IS NOT NULL AS sent,
+            o.name AS agency,
+            o.slug AS "agencySlug"
+        FROM public.application a
+        LEFT JOIN public.scout_profile s ON s.id = a.scout_id
+        JOIN neon_auth.organization o ON o.id = a.organization_id
+        WHERE a.id = ${id}
+    `
+    const application = rows[0] as ApplicationProfile | undefined
+    if (!application) return null
+
+    const events = await sql`
+        SELECT e.kind, e.stage, e.at, u.name AS actor
+        FROM public.application_event e
+        LEFT JOIN neon_auth."user" u ON u.id = e.actor_id
+        WHERE e.application_id = ${id}
+        ORDER BY e.at
+    `
+
+    return { ...application, events: events as ApplicationEvent[] }
+}

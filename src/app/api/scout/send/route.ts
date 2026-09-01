@@ -36,6 +36,15 @@ export async function POST(request: Request) {
       RETURNING id
     `;
 
+    if (sent.length > 0) {
+      await sql`
+        INSERT INTO public.application_event
+          (application_id, kind, actor_id)
+        SELECT unnest(${sent.map((r) => (r as { id: string }).id)}::uuid[]),
+               'sent_on', ${user.id}
+      `;
+    }
+
     return NextResponse.json({ success: true, sent: sent.length });
   } catch (error) {
     console.error("Scout send error:", error);

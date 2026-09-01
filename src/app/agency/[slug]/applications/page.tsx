@@ -36,6 +36,7 @@ export default async function AgencyApplications({
             <ApplicationsBoard
                 applications={applications}
                 organizationId={membership.organizationId}
+                slug={slug}
             />
         </>
     )

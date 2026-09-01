@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Check, ChevronDown } from "lucide-react"
 
 import type { ApplicationRow } from "@/lib/applications"
@@ -41,6 +42,7 @@ export function ApplicationCard({
     open,
     onOpen,
     showScout,
+    href,
 }: {
     row: ApplicationRow
     selected: boolean
@@ -48,6 +50,8 @@ export function ApplicationCard({
     open: boolean
     onOpen: () => void
     showScout?: boolean
+    /** The full profile for this person, when the viewer can reach one. */
+    href?: string
 }) {
     return (
         <div
@@ -101,19 +105,29 @@ export function ApplicationCard({
                         )}
                     </button>
 
-                    <button
-                        type="button"
-                        onClick={onOpen}
-                        aria-expanded={open}
-                        className="mt-2 flex items-center gap-1 text-xs text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
-                    >
-                        {open ? "Less" : "Everything"}
-                        <ChevronDown
-                            className={`h-3 w-3 transition-transform ${
-                                open ? "rotate-180" : ""
-                            }`}
-                        />
-                    </button>
+                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <button
+                            type="button"
+                            onClick={onOpen}
+                            aria-expanded={open}
+                            className="flex items-center gap-1 text-xs text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+                        >
+                            {open ? "Less" : "Everything"}
+                            <ChevronDown
+                                className={`h-3 w-3 transition-transform ${
+                                    open ? "rotate-180" : ""
+                                }`}
+                            />
+                        </button>
+                        {href && (
+                            <Link
+                                href={href}
+                                className="text-xs text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+                            >
+                                Open
+                            </Link>
+                        )}
+                    </div>
                 </div>
 
                 {open && <Detail row={row} />}
@@ -301,11 +315,13 @@ export function ApplicationGrid({
     selected,
     onToggle,
     showScout,
+    hrefFor,
 }: {
     rows: ApplicationRow[]
     selected: string[]
     onToggle: (id: string) => void
     showScout?: boolean
+    hrefFor?: (id: string) => string
 }) {
     return rows.length === 0 ? null : (
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -316,6 +332,7 @@ export function ApplicationGrid({
                     selected={selected.includes(r.id)}
                     onToggle={() => onToggle(r.id)}
                     showScout={showScout}
+                    href={hrefFor?.(r.id)}
                 />
             ))}
         </div>
@@ -328,11 +345,13 @@ function GridItem({
     selected,
     onToggle,
     showScout,
+    href,
 }: {
     row: ApplicationRow
     selected: boolean
     onToggle: () => void
     showScout?: boolean
+    href?: string
 }) {
     const [open, setOpen] = useState(false)
     return (
@@ -343,6 +362,7 @@ function GridItem({
             open={open}
             onOpen={() => setOpen(!open)}
             showScout={showScout}
+            href={href}
         />
     )
 }

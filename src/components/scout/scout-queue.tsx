@@ -111,6 +111,7 @@ export function ScoutQueue({ waiting }: { waiting: ApplicationRow[] }) {
                         rows={rows}
                         selected={picked}
                         onToggle={toggle}
+                        hrefFor={(id) => `/scout/applications/${id}`}
                     />
 
                     <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-border pt-5">

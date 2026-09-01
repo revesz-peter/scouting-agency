@@ -28,9 +28,11 @@ import type { ApplicationRow } from "@/lib/applications"
 export function ApplicationsBoard({
     applications,
     organizationId,
+    slug,
 }: {
     applications: ApplicationRow[]
     organizationId: string
+    slug: string
 }) {
     const router = useRouter()
 
@@ -147,6 +149,7 @@ export function ApplicationsBoard({
                         selected={selected}
                         onToggle={toggle}
                         showScout
+                        hrefFor={(id) => `/agency/${slug}/applications/${id}`}
                     />
                 )}
 

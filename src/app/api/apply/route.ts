@@ -68,7 +68,7 @@ async function persist(
   // choice is what their kept rate measures.
   const sentAt = referrer ? null : new Date().toISOString();
 
-  await Promise.all(
+  const inserted = await Promise.all(
     agencies.map(
       (agency) => sql`
         INSERT INTO public.application (
@@ -87,9 +87,17 @@ async function persist(
           ${values.videoLink || null}, ${values.portfolioLink || null},
           ${values.notes || null}, ${sentAt}
         )
+        RETURNING id
       `
     )
   );
+
+  // The arrival is the first line of the history the profile shows.
+  const ids = inserted.flat().map((r) => (r as { id: string }).id);
+  await sql`
+    INSERT INTO public.application_event (application_id, kind, stage)
+    SELECT unnest(${ids}::uuid[]), 'applied', 'applied'
+  `;
 }
 
 function escapeHtml(value: string): string {
