@@ -6,12 +6,15 @@ import qrcode from "qrcode-generator"
 /**
  * Sample names for the card preview on the marketing page. This is a designer
  * demo, not a directory — a client component cannot read the real agencies, and
- * showing them here would be beside the point.
+ * showing them here would be beside the point. Alphabetical, so no name reads
+ * as ranked above another.
  */
 const SAMPLE_AGENCIES = [
+    "Donna Models",
+    "Ford Models",
     "OMG Model Management",
-    "Visage Models",
-    "Attitude Management",
+    "Silent Paris",
+    "Supreme Paris",
 ]
 
 /** A real, scannable QR code rendered as SVG rectangles. */
