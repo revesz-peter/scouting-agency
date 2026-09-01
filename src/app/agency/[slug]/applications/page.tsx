@@ -20,7 +20,7 @@ export default async function AgencyApplications({
     const applications = await agencyInbox(membership.organizationId)
 
     return (
-        <>
+        <div className="mx-auto w-full max-w-6xl">
             <p className="text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
                 Stage 01
             </p>
@@ -37,6 +37,6 @@ export default async function AgencyApplications({
                 applications={applications}
                 organizationId={membership.organizationId}
             />
-        </>
+        </div>
     )
 }

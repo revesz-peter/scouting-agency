@@ -1,23 +1,31 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Send } from "lucide-react"
 
-import { ApplicationCard } from "@/components/applications/application-card"
-import type { ApplicationCard as Card } from "@/lib/applications"
+import {
+    ApplicationTable,
+    SORTS,
+    sortRows,
+    type SortKey,
+} from "@/components/applications/application-table"
+import type { ApplicationRow } from "@/lib/applications"
 
 /**
  * What a scout is holding. Nothing reaches the agency until it is sent, so this
  * is the one screen where a scout decides what their name goes on.
  */
-export function ScoutQueue({ waiting }: { waiting: Card[] }) {
+export function ScoutQueue({ waiting }: { waiting: ApplicationRow[] }) {
     const router = useRouter()
+    const [sort, setSort] = useState<SortKey>("applied")
     const [picked, setPicked] = useState<string[]>([])
     const [sent, setSent] = useState(0)
     const [busy, setBusy] = useState(false)
     const [error, setError] = useState("")
+
+    const rows = useMemo(() => sortRows(waiting, sort), [waiting, sort])
 
     function toggle(id: string) {
         setSent(0)
@@ -71,16 +79,39 @@ export function ScoutQueue({ waiting }: { waiting: Card[] }) {
                 </p>
             ) : (
                 <>
-                    <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                        {waiting.map((a) => (
-                            <ApplicationCard
-                                key={a.id}
-                                application={a}
-                                selected={picked.includes(a.id)}
-                                onSelect={() => toggle(a.id)}
-                            />
-                        ))}
+                    <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3">
+                        <p className="text-xs text-muted-foreground">
+                            {picked.length > 0
+                                ? `${picked.length} selected`
+                                : `${rows.length} waiting`}
+                        </p>
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-xs uppercase tracking-[0.1em] text-muted-foreground">
+                                Sort
+                            </span>
+                            {SORTS.map((s) => (
+                                <button
+                                    key={s.key}
+                                    type="button"
+                                    onClick={() => setSort(s.key)}
+                                    aria-pressed={sort === s.key}
+                                    className={`border px-2 py-1 text-xs transition-colors ${
+                                        sort === s.key
+                                            ? "border-foreground bg-foreground text-background"
+                                            : "border-border text-muted-foreground hover:border-foreground/30"
+                                    }`}
+                                >
+                                    {s.label}
+                                </button>
+                            ))}
+                        </div>
                     </div>
+
+                    <ApplicationTable
+                        rows={rows}
+                        selected={picked}
+                        onToggle={toggle}
+                    />
 
                     <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-border pt-5">
                         <button

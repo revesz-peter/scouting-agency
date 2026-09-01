@@ -32,7 +32,7 @@ export default async function ScoutWorkspace() {
     const stats = rows[0]
 
     return (
-        <>
+        <div className="mx-auto w-full max-w-3xl">
             <p className="text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
                 Scout
             </p>
@@ -85,13 +85,13 @@ export default async function ScoutWorkspace() {
                     ))}
                 </ul>
             </section>
-        </>
+        </div>
     )
 }
 
 function NoScoutProfile({ agencies }: { agencies: number }) {
     return (
-        <>
+        <div className="mx-auto w-full max-w-3xl">
             <p className="text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
                 Scout
             </p>
@@ -111,7 +111,7 @@ function NoScoutProfile({ agencies }: { agencies: number }) {
             >
                 Get a scout link
             </Link>
-        </>
+        </div>
     )
 }
 

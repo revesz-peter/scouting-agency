@@ -59,7 +59,7 @@ export default async function AgencyOverview({
     const live = status === "active"
 
     return (
-        <>
+        <div className="mx-auto w-full max-w-3xl">
             <p className="text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
                 Agency
             </p>
@@ -137,7 +137,7 @@ export default async function AgencyOverview({
                     </p>
                 </section>
             )}
-        </>
+        </div>
     )
 }
 

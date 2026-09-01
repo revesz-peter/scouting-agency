@@ -19,7 +19,7 @@ export default async function AgencySettings({
     const owner = membership.role === "owner"
 
     return (
-        <>
+        <div className="mx-auto w-full max-w-3xl">
             <p className="text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
                 {membership.name}
             </p>
@@ -48,6 +48,6 @@ export default async function AgencySettings({
                     </p>
                 )}
             </section>
-        </>
+        </div>
     )
 }

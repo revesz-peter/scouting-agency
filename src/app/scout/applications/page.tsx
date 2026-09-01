@@ -24,7 +24,7 @@ export default async function ScoutApplications() {
     ])
 
     return (
-        <>
+        <div className="mx-auto w-full max-w-6xl">
             <p className="text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
                 Scout
             </p>
@@ -39,6 +39,6 @@ export default async function ScoutApplications() {
 
             <ScoutFunnel applied={funnel.applied} sent={funnel.sent} />
             <ScoutQueue waiting={waiting} />
-        </>
+        </div>
     )
 }
