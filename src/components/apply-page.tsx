@@ -3,7 +3,6 @@
 import { useState, useRef, useCallback } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
 import { AnimatePresence, motion } from "framer-motion"
 import { Upload, X, Loader2, Check } from "lucide-react"
 import Link from "next/link"
@@ -22,82 +21,14 @@ import {
     WAISTS,
     type Option,
 } from "@/lib/application-options"
+import {
+    applicationSchema,
+    photoSchema,
+    type ApplicationData,
+} from "@/lib/schemas/application"
 
 // ─── Schema ───────────────────────────────────────────────
-
-const MAX_FILE_SIZE = 10 * 1024 * 1024
-const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic"]
-const MIN_AGE = 14
-
-const photoSchema = z
-    .custom<File>()
-    .refine((f) => f instanceof File, "Please upload a file")
-    .refine((f) => f.size <= MAX_FILE_SIZE, "Max 10 MB per photo")
-    .refine(
-        (f) => ACCEPTED_TYPES.includes(f.type),
-        "JPG, PNG, WebP, or HEIC only",
-    )
-
-function ageFrom(dob: string): number {
-    const birth = new Date(dob)
-    const now = new Date()
-    let age = now.getFullYear() - birth.getFullYear()
-    const monthDiff = now.getMonth() - birth.getMonth()
-    if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) {
-        age--
-    }
-    return age
-}
-
-
-const optionalUrl = z
-    .string()
-    .trim()
-    .optional()
-    .refine(
-        (v) => !v || /^https?:\/\/.+\..+/.test(v),
-        "Enter a full link starting with http",
-    )
-
-const applicationSchema = z.object({
-    // 01 Personal
-    firstName: z.string().trim().min(1, "Required"),
-    lastName: z.string().trim().min(1, "Required"),
-    email: z.string().email("Enter a valid email"),
-    phone: z.string().trim().min(6, "Required"),
-    dob: z
-        .string()
-        .min(1, "Required")
-        .refine((v) => !Number.isNaN(Date.parse(v)), "Enter a valid date")
-        .refine((v) => ageFrom(v) >= MIN_AGE, `Minimum age is ${MIN_AGE}`)
-        .refine((v) => ageFrom(v) <= 99, "Enter a valid date"),
-    gender: z.string().min(1, "Required"),
-    city: z.string().trim().min(1, "Required"),
-    country: z
-        .string()
-        .trim()
-        .min(1, "Required")
-        .refine((v) => COUNTRIES.includes(v), "Pick a country from the list"),
-    instagram: z.string().trim().optional(),
-
-    // 02 Measurements
-    height: z.string().min(1, "Required"),
-    bust: z.string().min(1, "Required"),
-    waist: z.string().min(1, "Required"),
-    hips: z.string().min(1, "Required"),
-    shoeSize: z.string().min(1, "Required"),
-    hairColor: z.string().min(1, "Required"),
-    eyeColor: z.string().min(1, "Required"),
-
-    // 03/04/05
-    videoLink: optionalUrl,
-    portfolioLink: optionalUrl,
-    notes: z.string().trim().max(2000, "Keep it under 2000 characters").optional(),
-
-    consent: z.literal(true, { error: "You must agree to continue" }),
-})
-
-type ApplicationData = z.infer<typeof applicationSchema>
+// Shared with /api/apply so the server validates exactly what this form does.
 
 // ─── Digitals ─────────────────────────────────────────────
 

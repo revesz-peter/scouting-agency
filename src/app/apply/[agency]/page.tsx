@@ -3,17 +3,16 @@ import { notFound } from "next/navigation"
 import { ApplyPage } from "@/components/apply-page"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
-import { AGENCIES, getAgency } from "@/lib/agencies"
+import { getAgency } from "@/lib/agencies"
 
-export function generateStaticParams() {
-    return AGENCIES.map((agency) => ({ agency: agency.slug }))
-}
+// Agencies are created at runtime, so there is no fixed set to pre-render.
+export const dynamic = "force-dynamic"
 
 export async function generateMetadata(
     props: PageProps<"/apply/[agency]">,
 ): Promise<Metadata> {
     const { agency: slug } = await props.params
-    const agency = getAgency(slug)
+    const agency = await getAgency(slug)
     if (!agency) return {}
 
     const title = `Apply to ${agency.name}`
@@ -34,7 +33,7 @@ export async function generateMetadata(
 
 export default async function AgencyApply(props: PageProps<"/apply/[agency]">) {
     const { agency: slug } = await props.params
-    const agency = getAgency(slug)
+    const agency = await getAgency(slug)
     if (!agency) notFound()
 
     return (

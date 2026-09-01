@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
-import { getAgency } from "@/lib/agencies";
-import { getScout } from "@/lib/scouts";
+import { sql } from "@/lib/db";
+import { sendEmail } from "@/lib/email";
+import {
+  ageFrom,
+  applicationSchema,
+  photoSchema,
+  type ApplicationData,
+} from "@/lib/schemas/application";
 
 const PHOTO_KEYS = [
   { key: "photo_headshot", label: "Headshot" },
@@ -33,16 +39,52 @@ const FIELDS = [
 
 type FieldName = (typeof FIELDS)[number];
 
-function ageFrom(dob: string): number | null {
-  const birth = new Date(dob);
-  if (Number.isNaN(birth.getTime())) return null;
-  const now = new Date();
-  let age = now.getFullYear() - birth.getFullYear();
-  const monthDiff = now.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) {
-    age--;
-  }
-  return age;
+interface AgencyRow {
+  id: string;
+  slug: string;
+  name: string;
+}
+
+interface ScoutRow {
+  id: string;
+  code: string;
+  name: string;
+}
+
+/**
+ * One row per agency the application was addressed to, sharing a submission_id.
+ * Each agency reviews its own copy independently, so a decision by one says
+ * nothing about the others.
+ */
+async function persist(
+  values: ApplicationData,
+  agencies: AgencyRow[],
+  referrer: ScoutRow | null
+) {
+  const submissionId = crypto.randomUUID();
+
+  await Promise.all(
+    agencies.map(
+      (agency) => sql`
+        INSERT INTO public.application (
+          submission_id, organization_id, scout_id,
+          first_name, last_name, email, phone, dob, gender, city, country, instagram,
+          height_cm, bust_cm, waist_cm, hips_cm, shoe_eu, hair_color, eye_color,
+          video_link, portfolio_link, notes
+        ) VALUES (
+          ${submissionId}, ${agency.id}, ${referrer?.id ?? null},
+          ${values.firstName}, ${values.lastName}, ${values.email}, ${values.phone},
+          ${values.dob}, ${values.gender}, ${values.city}, ${values.country},
+          ${values.instagram || null},
+          ${Number(values.height)}, ${Number(values.bust)}, ${Number(values.waist)},
+          ${Number(values.hips)}, ${Number(values.shoeSize)},
+          ${values.hairColor}, ${values.eyeColor},
+          ${values.videoLink || null}, ${values.portfolioLink || null},
+          ${values.notes || null}
+        )
+      `
+    )
+  );
 }
 
 function escapeHtml(value: string): string {
@@ -57,46 +99,90 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData();
 
-    const values = {} as Record<FieldName, string>;
+    const raw = {} as Record<FieldName, string>;
     for (const field of FIELDS) {
-      values[field] = ((formData.get(field) as string | null) ?? "").trim();
+      raw[field] = ((formData.get(field) as string | null) ?? "").trim();
     }
 
-    // Which agencies this application was addressed to
-    const agencies = ((formData.get("agencies") as string | null) ?? "")
-      .split(",")
-      .map((slug) => slug.trim())
-      .filter(Boolean)
-      .map((slug) => getAgency(slug))
-      .filter((agency) => agency !== undefined);
+    // The form validates in the browser, but a direct POST does not go through
+    // it — and this now writes to the database. Re-check everything here,
+    // including the age floor the terms page commits to.
+    const parsed = applicationSchema.safeParse({ ...raw, consent: true });
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Some answers need another look", issues: parsed.error.issues },
+        { status: 400 }
+      );
+    }
+    const values: ApplicationData = parsed.data;
 
-    // Scout whose personal link the applicant came through
-    const referrerCode = ((formData.get("ref") as string | null) ?? "").trim();
-    const referrer = referrerCode ? getScout(referrerCode) : undefined;
-
-    // Collect digitals
+    // Collect digitals. All four are required, and each has to be an image
+    // within the size limit — the browser checked, but re-check regardless.
     const photos: { name: string; label: string; content: Buffer }[] = [];
     for (const { key, label } of PHOTO_KEYS) {
       const file = formData.get(key) as File | null;
-      if (file && file.size > 0) {
-        const bytes = await file.arrayBuffer();
-        photos.push({ name: file.name, label, content: Buffer.from(bytes) });
+      const photo = photoSchema.safeParse(file);
+      if (!photo.success) {
+        return NextResponse.json(
+          { error: `${label}: ${photo.error.issues[0]?.message ?? "invalid"}` },
+          { status: 400 }
+        );
       }
+      const bytes = await file!.arrayBuffer();
+      photos.push({ name: file!.name, label, content: Buffer.from(bytes) });
     }
 
+    // Which agencies this application was addressed to. Resolved against the
+    // database — an agency only receives applications once it actually exists.
+    const slugs = ((formData.get("agencies") as string | null) ?? "")
+      .split(",")
+      .map((slug) => slug.trim())
+      .filter(Boolean);
+
+    const agencies = slugs.length
+      ? ((await sql`
+          SELECT id, slug, name
+          FROM neon_auth.organization
+          WHERE slug = ANY(${slugs})
+        `) as AgencyRow[])
+      : [];
+
+    // Scout whose personal link the applicant came through. Credit follows the
+    // application from here through pre-select, the vote, and signing.
+    const referrerCode = ((formData.get("ref") as string | null) ?? "")
+      .trim()
+      .toLowerCase();
+    const referrer = referrerCode
+      ? (((
+          await sql`
+            SELECT id, code, display_name AS name
+            FROM public.scout_profile
+            WHERE code = ${referrerCode}
+          `
+        )[0] as ScoutRow | undefined) ?? null)
+      : null;
+
+    // An application addressed to nobody is worse than a rejected one: the
+    // applicant is told it went through and it is stored nowhere.
+    if (agencies.length === 0) {
+      return NextResponse.json(
+        { error: "That agency isn't taking applications here." },
+        { status: 404 }
+      );
+    }
+
+    await persist(values, agencies, referrer);
+
     const fullName = `${values.firstName} ${values.lastName}`.trim();
-    const age = values.dob ? ageFrom(values.dob) : null;
-    const recipients = agencies.map((a) => a.name).join(", ") || "—";
+    const age = ageFrom(values.dob);
+    const recipients = agencies.map((a) => a.name).join(", ");
     const credited = referrer ? `${referrer.name} (${referrer.code})` : "";
 
-    // Send email via Resend
-    const RESEND_API_KEY = process.env.RESEND_API_KEY;
-    const NOTIFY_EMAIL = process.env.NOTIFY_EMAIL || "reveszpeter26@gmail.com";
+    // The digitals only exist in this email — the database holds the structured
+    // fields, not the photos — so it matters that it goes out.
+    const NOTIFY_EMAIL = process.env.NOTIFY_EMAIL;
 
-    if (RESEND_API_KEY) {
-      const { Resend } = await import("resend");
-      const resend = new Resend(RESEND_API_KEY);
-
+    if (NOTIFY_EMAIL) {
       const row = (label: string, value: string) =>
         value
           ? `<tr>
@@ -113,10 +199,9 @@ export async function POST(request: Request) {
             </tr>`
           : "";
 
-      const handle = values.instagram.replace(/^@/, "");
+      const handle = (values.instagram ?? "").replace(/^@/, "");
 
-      await resend.emails.send({
-        from: "scouting <hello@budapestlabs.com>",
+      await sendEmail({
         to: NOTIFY_EMAIL,
         subject: `New application: ${fullName}${age !== null && age < 18 ? " (minor)" : ""} → ${recipients}${credited ? ` (via ${referrer!.name})` : ""}`,
         html: `
@@ -164,9 +249,9 @@ export async function POST(request: Request) {
             <div style="padding:24px 0;border-bottom:1px solid #e5e5e5;">
               <p style="margin:0 0 8px;font-size:10px;text-transform:uppercase;letter-spacing:0.2em;color:#999;">Links &amp; notes</p>
               <table style="border-collapse:collapse;width:100%;font-size:13px;">
-                ${linkRow("Video", values.videoLink)}
-                ${linkRow("Portfolio", values.portfolioLink)}
-                ${row("Notes", values.notes)}
+                ${linkRow("Video", values.videoLink ?? "")}
+                ${linkRow("Portfolio", values.portfolioLink ?? "")}
+                ${row("Notes", values.notes ?? "")}
               </table>
             </div>
             ` : ""}

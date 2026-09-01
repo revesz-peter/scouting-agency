@@ -2,7 +2,17 @@
 
 import { useMemo, useState } from "react"
 import qrcode from "qrcode-generator"
-import { AGENCIES } from "@/lib/agencies"
+
+/**
+ * Sample names for the card preview on the marketing page. This is a designer
+ * demo, not a directory — a client component cannot read the real agencies, and
+ * showing them here would be beside the point.
+ */
+const SAMPLE_AGENCIES = [
+    "OMG Model Management",
+    "Visage Models",
+    "Attitude Management",
+]
 
 /** A real, scannable QR code rendered as SVG rectangles. */
 function QrBlock({ value, className = "" }: { value: string; className?: string }) {
@@ -209,9 +219,9 @@ export function ScoutCardDesigner() {
                             className="mt-1.5 w-full appearance-none rounded-none border-b border-border bg-transparent py-1.5 text-xs outline-none transition-colors focus:border-foreground/30"
                         >
                             <option value="">No agency</option>
-                            {AGENCIES.map((a) => (
-                                <option key={a.slug} value={a.name}>
-                                    {a.name}
+                            {SAMPLE_AGENCIES.map((a) => (
+                                <option key={a} value={a}>
+                                    {a}
                                 </option>
                             ))}
                         </select>

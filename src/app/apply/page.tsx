@@ -3,7 +3,7 @@ import Link from "next/link"
 import { ApplyPage } from "@/components/apply-page"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
-import { AGENCIES } from "@/lib/agencies"
+import { listAgencies } from "@/lib/agencies"
 
 export const metadata: Metadata = {
     title: "Become a model",
@@ -20,7 +20,11 @@ export const metadata: Metadata = {
     },
 }
 
-export default function Apply() {
+export const dynamic = "force-dynamic"
+
+export default async function Apply() {
+    const agencies = await listAgencies()
+
     return (
         <div className="flex min-h-svh flex-col">
             <SiteHeader />
@@ -39,7 +43,7 @@ export default function Apply() {
                     </Link>
                 </div>
             </div>
-            <ApplyPage agencies={AGENCIES} />
+            <ApplyPage agencies={agencies} />
             <SiteFooter />
         </div>
     )
