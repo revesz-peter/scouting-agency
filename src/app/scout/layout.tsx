@@ -3,11 +3,7 @@ import { redirect } from "next/navigation"
 import { AppShell } from "@/components/app/app-shell"
 import { scoutSections, toWorkspaces } from "@/lib/app-nav"
 import { getAdmin } from "@/lib/auth/admin"
-import {
-    getMemberships,
-    getScoutProfile,
-    getUser,
-} from "@/lib/auth/membership"
+import { getMemberships, getUser } from "@/lib/auth/membership"
 
 export const dynamic = "force-dynamic"
 
@@ -24,9 +20,8 @@ export default async function ScoutLayout({
     const user = await getUser()
     if (!user) redirect("/agency/sign-in")
 
-    const [memberships, scout, admin] = await Promise.all([
+    const [memberships, admin] = await Promise.all([
         getMemberships(user.id),
-        getScoutProfile(user.id),
         getAdmin(),
     ])
 
@@ -40,9 +35,6 @@ export default async function ScoutLayout({
             workspaces={toWorkspaces(memberships)}
             current={memberships[0].slug}
             email={user.email}
-            link={
-                scout ? { label: "Your link", path: `/s/${scout.code}` } : undefined
-            }
         >
             {children}
         </AppShell>

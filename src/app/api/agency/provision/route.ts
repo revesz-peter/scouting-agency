@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { initialAgencyStatus } from "@/lib/auth/admin";
 import { getMemberships, getUser } from "@/lib/auth/membership";
 import { sql } from "@/lib/db";
 
@@ -53,12 +54,18 @@ export async function POST() {
       );
     }
 
+    // Set explicitly rather than leaning on the column default, so whether new
+    // agencies wait for an operator is a config change, not a migration.
+    const status = initialAgencyStatus();
+
     await sql`
       INSERT INTO public.agency_profile
-        (organization_id, website, city, country, board_size, notes)
+        (organization_id, website, city, country, board_size, notes, status,
+         confirmed_at)
       VALUES
         (${agency.organizationId}, ${request.website}, ${request.city},
-         ${request.country}, ${request.board_size}, ${request.notes})
+         ${request.country}, ${request.board_size}, ${request.notes},
+         ${status}, ${status === "active" ? new Date().toISOString() : null})
       ON CONFLICT (organization_id) DO NOTHING
     `;
 

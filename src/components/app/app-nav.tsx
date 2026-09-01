@@ -4,9 +4,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useState } from "react"
 
-import { CopyButton } from "@/components/copy-button"
 import { authClient } from "@/lib/auth/client"
-import { siteUrl } from "@/lib/site"
 
 export interface NavItem {
     label: string
@@ -26,14 +24,6 @@ export interface Workspace {
     staff: boolean
 }
 
-/** The link this person hands out, shown short and copied in full. */
-export interface ShareLink {
-    label: string
-    path: string
-    /** A link that does not work yet is shown, but not offered for copying. */
-    live?: boolean
-}
-
 /**
  * The in-app navigation. Sections with no `href` are planned and render as
  * muted text rather than dead links — the shape of the product is useful to
@@ -44,15 +34,13 @@ export function AppNav({
     workspaces,
     current,
     email,
-    link,
     settingsHref,
 }: {
     sections: NavSection[]
     workspaces: Workspace[]
     current: string | null
     email: string
-    link?: ShareLink
-    /** Rendered below the link rather than in the nav. */
+    /** Rendered below the nav rather than in it. */
     settingsHref?: string
 }) {
     const pathname = usePathname()
@@ -158,44 +146,10 @@ export function AppNav({
                 </nav>
             </div>
 
-            {/* The link you hand out is a reference, not somewhere you navigate
-                to, so it sits down here with the account rather than above the
-                nav. One group, so `justify-between` keeps nav up and these
-                down instead of spreading three blocks evenly. */}
+            {/* Settings and the account: the things that are not the work
+                itself. The links an agency or scout hands out live on their own
+                pages, where there is room to explain them. */}
             <div className="space-y-5">
-                {link && (
-                <div className="border-t border-border pt-5">
-                    <p className="text-xs font-medium uppercase tracking-[0.15em] text-muted-foreground/70">
-                        {link.label}
-                    </p>
-                    <div className="mt-1 flex items-center gap-1.5">
-                        {/* Short form: the host is the same for everyone and
-                            would only crowd a narrow column. Copying still
-                            gives the whole URL. */}
-                        <span
-                            className={`min-w-0 truncate text-sm ${
-                                link.live === false
-                                    ? "text-muted-foreground/50 line-through"
-                                    : "text-foreground"
-                            }`}
-                        >
-                            {link.path}
-                        </span>
-                        {link.live !== false && (
-                            <CopyButton
-                                value={siteUrl(link.path)}
-                                label={`Copy ${link.label.toLowerCase()}`}
-                            />
-                        )}
-                    </div>
-                    {link.live === false && (
-                        <p className="mt-1 text-xs text-muted-foreground/70">
-                            Not live yet
-                        </p>
-                    )}
-                </div>
-                )}
-
                 {settingsHref && (
                     <div className="border-t border-border pt-5">
                         <Link

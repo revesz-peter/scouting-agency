@@ -6,7 +6,6 @@ import {
 } from "@/lib/app-nav"
 import { getAdmin } from "@/lib/auth/admin"
 import { requireAgency } from "@/lib/auth/membership"
-import { sql } from "@/lib/db"
 
 export const dynamic = "force-dynamic"
 
@@ -20,17 +19,9 @@ export default async function AgencyLayout({
     children,
 }: LayoutProps<"/agency/[slug]">) {
     const { slug } = await params
-    const { user, memberships, membership } = await requireAgency(slug)
+    const { user, memberships } = await requireAgency(slug)
 
-    const [admin, profile] = await Promise.all([
-        getAdmin(),
-        sql`
-            SELECT status
-            FROM public.agency_profile
-            WHERE organization_id = ${membership.organizationId}
-        `,
-    ])
-    const live = (profile[0] as { status: string } | undefined)?.status === "active"
+    const admin = await getAdmin()
 
     return (
         <AppShell
@@ -38,7 +29,6 @@ export default async function AgencyLayout({
             workspaces={toWorkspaces(memberships)}
             current={slug}
             email={user.email}
-            link={{ label: "Apply link", path: `/apply/${slug}`, live }}
             settingsHref={agencySettingsHref(slug)}
         >
             {children}

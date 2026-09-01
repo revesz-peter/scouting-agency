@@ -1,7 +1,6 @@
 import {
     AppNav,
     type NavSection,
-    type ShareLink,
     type Workspace,
 } from "@/components/app/app-nav"
 
@@ -18,7 +17,6 @@ export function AppShell({
     workspaces,
     current,
     email,
-    link,
     settingsHref,
     children,
 }: {
@@ -26,7 +24,6 @@ export function AppShell({
     workspaces: Workspace[]
     current: string | null
     email: string
-    link?: ShareLink
     settingsHref?: string
     children: React.ReactNode
 }) {
@@ -38,7 +35,6 @@ export function AppShell({
                     workspaces={workspaces}
                     current={current}
                     email={email}
-                    link={link}
                     settingsHref={settingsHref}
                 />
             </aside>

@@ -3,6 +3,26 @@ import { notFound } from "next/navigation"
 import { getUser } from "@/lib/auth/membership"
 
 /**
+ * Whether a new agency waits for an operator before its public links work.
+ *
+ * Off for now: the emailed code already proves someone controls the address
+ * they registered with, and holding every agency in a queue costs more than it
+ * currently buys. The machinery stays — the panel, the statuses, the gate on
+ * every public surface — so turning this on is one variable, not a rebuild, and
+ * an agency can still be suspended by hand today.
+ *
+ * Set REQUIRE_AGENCY_CONFIRMATION=true to make new agencies start pending.
+ */
+export function requiresConfirmation(): boolean {
+    return process.env.REQUIRE_AGENCY_CONFIRMATION?.trim() === "true"
+}
+
+/** The status a newly created agency starts in. */
+export function initialAgencyStatus(): "pending" | "active" {
+    return requiresConfirmation() ? "pending" : "active"
+}
+
+/**
  * Who operates the platform. A single address from the environment rather than
  * a role in the database: there is one operator, and a value nobody can write
  * to at runtime cannot be escalated into.
