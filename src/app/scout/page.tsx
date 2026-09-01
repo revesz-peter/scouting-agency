@@ -2,7 +2,7 @@ import Link from "next/link"
 import type { Metadata } from "next"
 
 import { CopyButton } from "@/components/copy-button"
-import { requireProfile } from "@/lib/auth/membership"
+import { requireMember } from "@/lib/auth/membership"
 import { sql } from "@/lib/db"
 import { siteLink, siteUrl } from "@/lib/site"
 
@@ -14,7 +14,11 @@ export const metadata: Metadata = {
 }
 
 export default async function ScoutWorkspace() {
-    const { scout, memberships } = await requireProfile()
+    const { scout, memberships } = await requireMember()
+
+    // Staff are members too. Someone who runs an agency is not automatically a
+    // scout, so offer the link rather than marching them through onboarding.
+    if (!scout) return <NoScoutProfile agencies={memberships.length} />
 
     const rows = (await sql`
         SELECT
@@ -81,6 +85,32 @@ export default async function ScoutWorkspace() {
                     ))}
                 </ul>
             </section>
+        </>
+    )
+}
+
+function NoScoutProfile({ agencies }: { agencies: number }) {
+    return (
+        <>
+            <p className="text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
+                Scout
+            </p>
+            <h1 className="mt-4 text-2xl leading-[1.15] text-foreground sm:text-3xl font-[family-name:var(--font-libre)]">
+                Scout as well?
+            </h1>
+            <p className="mt-4 max-w-prose text-xs leading-relaxed text-muted-foreground">
+                Running an agency does not make you a scout. Take a scout link
+                and applications through it are credited to you at{" "}
+                {agencies === 1 ? "your agency" : "the agencies you belong to"} —
+                the same as anyone else on the roster. Leave it and nothing
+                changes.
+            </p>
+            <Link
+                href="/onboarding/scout"
+                className="mt-8 inline-block bg-foreground px-6 py-2.5 text-xs font-medium uppercase tracking-[0.15em] text-background transition-colors hover:bg-foreground/90"
+            >
+                Get a scout link
+            </Link>
         </>
     )
 }

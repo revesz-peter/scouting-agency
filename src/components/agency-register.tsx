@@ -197,9 +197,12 @@ export function AgencyRegisterForm() {
                             autoComplete="new-password"
                             aria-required="true"
                         />
-                        <p className="mt-1.5 text-xs text-muted-foreground">
-                            At least {MIN_PASSWORD} characters. We email a code to
-                            confirm the address.
+                        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                            At least {MIN_PASSWORD} characters. We email a
+                            six-digit code to the address above and you cannot
+                            get in without it — that check is how an agency
+                            proves the address is really theirs, so applicants
+                            and scouts know who they are sending to.
                         </p>
                     </Field>
 

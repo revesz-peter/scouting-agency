@@ -4,7 +4,9 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useState } from "react"
 
+import { CopyButton } from "@/components/copy-button"
 import { authClient } from "@/lib/auth/client"
+import { siteUrl } from "@/lib/site"
 
 export interface NavItem {
     label: string
@@ -24,6 +26,12 @@ export interface Workspace {
     staff: boolean
 }
 
+/** The link this person hands out, shown short and copied in full. */
+export interface ShareLink {
+    label: string
+    path: string
+}
+
 /**
  * The in-app navigation. Sections with no `href` are planned and render as
  * muted text rather than dead links — the shape of the product is useful to
@@ -34,15 +42,25 @@ export function AppNav({
     workspaces,
     current,
     email,
+    link,
 }: {
     sections: NavSection[]
     workspaces: Workspace[]
     current: string | null
     email: string
+    link?: ShareLink
 }) {
     const pathname = usePathname()
     const router = useRouter()
     const [busy, setBusy] = useState(false)
+
+    // The longest matching href wins, so /agency/x/scouts does not also light
+    // up /agency/x. A prefix match alone would mark both.
+    const activeHref = sections
+        .flatMap((s) => s.items.map((i) => i.href))
+        .filter((href): href is string => Boolean(href))
+        .filter((href) => pathname === href || pathname.startsWith(`${href}/`))
+        .sort((a, b) => b.length - a.length)[0]
 
     async function signOut() {
         setBusy(true)
@@ -66,10 +84,27 @@ export function AppNav({
                 </Link>
 
                 {workspaces.length > 0 && (
-                    <WorkspaceSwitcher
-                        workspaces={workspaces}
-                        current={current}
-                    />
+                    <WorkspaceSwitcher workspaces={workspaces} current={current} />
+                )}
+
+                {link && (
+                    <div>
+                        <p className="text-xs font-medium uppercase tracking-[0.15em] text-muted-foreground/70">
+                            {link.label}
+                        </p>
+                        <div className="mt-1 flex items-center gap-1.5">
+                            {/* Short form: the host is the same for everyone and
+                                would only crowd a narrow column. Copying still
+                                gives the whole URL. */}
+                            <span className="min-w-0 truncate text-sm text-foreground">
+                                {link.path}
+                            </span>
+                            <CopyButton
+                                value={siteUrl(link.path)}
+                                label={`Copy ${link.label.toLowerCase()}`}
+                            />
+                        </div>
+                    </div>
                 )}
 
                 <nav className="space-y-7">
@@ -80,11 +115,6 @@ export function AppNav({
                             </p>
                             <ul className="space-y-1.5">
                                 {section.items.map((item) => {
-                                    const active =
-                                        item.href &&
-                                        (pathname === item.href ||
-                                            pathname.startsWith(`${item.href}/`))
-
                                     if (!item.href) {
                                         return (
                                             <li
@@ -98,6 +128,8 @@ export function AppNav({
                                             </li>
                                         )
                                     }
+
+                                    const active = item.href === activeHref
 
                                     return (
                                         <li key={item.label}>

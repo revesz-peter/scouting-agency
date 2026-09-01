@@ -1,4 +1,9 @@
-import { AppNav, type NavSection, type Workspace } from "@/components/app/app-nav"
+import {
+    AppNav,
+    type NavSection,
+    type ShareLink,
+    type Workspace,
+} from "@/components/app/app-nav"
 
 /**
  * The frame every signed-in page sits in. Deliberately not the marketing
@@ -13,12 +18,14 @@ export function AppShell({
     workspaces,
     current,
     email,
+    link,
     children,
 }: {
     sections: NavSection[]
     workspaces: Workspace[]
     current: string | null
     email: string
+    link?: ShareLink
     children: React.ReactNode
 }) {
     return (
@@ -29,6 +36,7 @@ export function AppShell({
                     workspaces={workspaces}
                     current={current}
                     email={email}
+                    link={link}
                 />
             </aside>
 

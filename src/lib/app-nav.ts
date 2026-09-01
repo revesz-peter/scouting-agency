@@ -25,7 +25,7 @@ export function agencySections(slug: string): NavSection[] {
             items: [
                 { label: "The board" },
                 { label: "Scouts", href: `/agency/${slug}/scouts` },
-                { label: "Settings" },
+                { label: "Settings", href: `/agency/${slug}/settings` },
             ],
         },
     ]
@@ -37,7 +37,7 @@ export function scoutSections(): NavSection[] {
             title: "Scouting",
             items: [
                 { label: "Workspace", href: "/scout" },
-                { label: "My leads" },
+                { label: "Applications" },
                 { label: "Card & QR" },
             ],
         },

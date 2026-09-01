@@ -22,6 +22,7 @@ export default async function AgencyLayout({
             workspaces={toWorkspaces(memberships)}
             current={slug}
             email={user.email}
+            link={{ label: "Apply link", path: `/apply/${slug}` }}
         >
             {children}
         </AppShell>

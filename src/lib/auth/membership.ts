@@ -60,10 +60,12 @@ export async function getScoutProfile(userId: string): Promise<ScoutProfile | nu
 }
 
 /**
- * Guard for any signed-in page. Redirects to sign-in when there is no session,
- * and to /onboarding/scout until the member has chosen their public code.
+ * Guard for the scout side. Requires a session and at least one agency, but
+ * deliberately not a scout profile: agency staff are members too, and opening
+ * /scout should not quietly turn an owner into a scout. Creating the profile is
+ * opt-in, so callers decide what to show when `scout` is null.
  */
-export async function requireProfile() {
+export async function requireMember() {
   const user = await getUser()
   if (!user) redirect("/agency/sign-in")
 
@@ -72,7 +74,7 @@ export async function requireProfile() {
     getScoutProfile(user.id),
   ])
 
-  if (!scout) redirect("/onboarding/scout")
+  if (memberships.length === 0) redirect("/scout/pending")
 
   return { user, memberships, scout }
 }
