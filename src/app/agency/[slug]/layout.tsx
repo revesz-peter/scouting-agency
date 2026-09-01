@@ -1,5 +1,9 @@
 import { AppShell } from "@/components/app/app-shell"
-import { agencySections, toWorkspaces } from "@/lib/app-nav"
+import {
+    agencySections,
+    agencySettingsHref,
+    toWorkspaces,
+} from "@/lib/app-nav"
 import { getAdmin } from "@/lib/auth/admin"
 import { requireAgency } from "@/lib/auth/membership"
 import { sql } from "@/lib/db"
@@ -35,6 +39,7 @@ export default async function AgencyLayout({
             current={slug}
             email={user.email}
             link={{ label: "Apply link", path: `/apply/${slug}`, live }}
+            settingsHref={agencySettingsHref(slug)}
         >
             {children}
         </AppShell>

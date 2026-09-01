@@ -38,14 +38,15 @@ export function agencySections(slug: string, admin = false): NavSection[] {
         })
     }
 
-    // Untitled and last: settings is somewhere you go occasionally, not part of
-    // the daily run through the pipeline.
-    sections.push({
-        title: "",
-        items: [{ label: "Settings", href: `/agency/${slug}/settings` }],
-    })
-
     return sections
+}
+
+/**
+ * Settings sits below the link an agency hands out, not in the nav: both belong
+ * to the bottom of the column, and the link is the thing you come looking for.
+ */
+export function agencySettingsHref(slug: string): string {
+    return `/agency/${slug}/settings`
 }
 
 export function scoutSections(admin = false): NavSection[] {

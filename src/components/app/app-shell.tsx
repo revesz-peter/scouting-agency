@@ -19,6 +19,7 @@ export function AppShell({
     current,
     email,
     link,
+    settingsHref,
     children,
 }: {
     sections: NavSection[]
@@ -26,6 +27,7 @@ export function AppShell({
     current: string | null
     email: string
     link?: ShareLink
+    settingsHref?: string
     children: React.ReactNode
 }) {
     return (
@@ -37,6 +39,7 @@ export function AppShell({
                     current={current}
                     email={email}
                     link={link}
+                    settingsHref={settingsHref}
                 />
             </aside>
 

@@ -45,12 +45,15 @@ export function AppNav({
     current,
     email,
     link,
+    settingsHref,
 }: {
     sections: NavSection[]
     workspaces: Workspace[]
     current: string | null
     email: string
     link?: ShareLink
+    /** Rendered below the link rather than in the nav. */
+    settingsHref?: string
 }) {
     const pathname = usePathname()
     const router = useRouter()
@@ -58,8 +61,13 @@ export function AppNav({
 
     // The longest matching href wins, so /agency/x/scouts does not also light
     // up /agency/x. A prefix match alone would mark both.
-    const activeHref = sections
-        .flatMap((s) => s.items.map((i) => i.href))
+    //
+    // Settings is outside the nav but still competes here: leaving it out would
+    // hand /agency/x/settings back to Overview and light two rows at once.
+    const activeHref = [
+        ...sections.flatMap((s) => s.items.map((i) => i.href)),
+        settingsHref,
+    ]
         .filter((href): href is string => Boolean(href))
         .filter((href) => pathname === href || pathname.startsWith(`${href}/`))
         .sort((a, b) => b.length - a.length)[0]
@@ -186,6 +194,30 @@ export function AppNav({
                         </p>
                     )}
                 </div>
+                )}
+
+                {settingsHref && (
+                    <div className="border-t border-border pt-5">
+                        <Link
+                            href={settingsHref}
+                            aria-current={
+                                activeHref === settingsHref ? "page" : undefined
+                            }
+                            className={`block text-sm transition-colors ${
+                                activeHref === settingsHref
+                                    ? "text-foreground"
+                                    : "text-muted-foreground hover:text-foreground"
+                            }`}
+                        >
+                            {activeHref === settingsHref && (
+                                <span
+                                    aria-hidden
+                                    className="mr-2 inline-block h-px w-3 -translate-y-[3px] bg-foreground"
+                                />
+                            )}
+                            Settings
+                        </Link>
+                    </div>
                 )}
 
                 <div className="hidden border-t border-border pt-5 lg:block">
