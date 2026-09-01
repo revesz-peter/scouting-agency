@@ -29,6 +29,7 @@ export default async function AgencyLayout({
             workspaces={toWorkspaces(memberships)}
             current={slug}
             email={user.email}
+            homeHref={`/agency/${slug}`}
             settingsHref={agencySettingsHref(slug)}
         >
             {children}

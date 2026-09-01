@@ -34,12 +34,15 @@ export function AppNav({
     workspaces,
     current,
     email,
+    homeHref,
     settingsHref,
 }: {
     sections: NavSection[]
     workspaces: Workspace[]
     current: string | null
     email: string
+    /** Where the wordmark goes: this workspace, not the marketing site. */
+    homeHref: string
     /** Rendered below the nav rather than in it. */
     settingsHref?: string
 }) {
@@ -74,8 +77,11 @@ export function AppNav({
     return (
         <div className="flex h-full flex-col gap-8 lg:justify-between">
             <div className="space-y-8">
+                {/* Home means the workspace, not the marketing site: someone
+                    signed in who clicks the wordmark wants the app, not the
+                    page that sells it to them. */}
                 <Link
-                    href="/"
+                    href={homeHref}
                     className="hidden text-xs font-bold uppercase tracking-[0.25em] text-foreground lg:block"
                 >
                     scouting.

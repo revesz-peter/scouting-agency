@@ -35,6 +35,7 @@ export default async function ScoutLayout({
             workspaces={toWorkspaces(memberships)}
             current={memberships[0].slug}
             email={user.email}
+            homeHref="/scout"
         >
             {children}
         </AppShell>

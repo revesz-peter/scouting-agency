@@ -17,6 +17,7 @@ export function AppShell({
     workspaces,
     current,
     email,
+    homeHref,
     settingsHref,
     children,
 }: {
@@ -24,6 +25,7 @@ export function AppShell({
     workspaces: Workspace[]
     current: string | null
     email: string
+    homeHref: string
     settingsHref?: string
     children: React.ReactNode
 }) {
@@ -35,6 +37,7 @@ export function AppShell({
                     workspaces={workspaces}
                     current={current}
                     email={email}
+                    homeHref={homeHref}
                     settingsHref={settingsHref}
                 />
             </aside>
