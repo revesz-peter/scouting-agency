@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 
-import { Control } from "@/components/applications/application-table"
+import { Control } from "@/components/applications/application-card"
 import type { ApplicationRow } from "@/lib/applications"
 
 export interface Filters {
@@ -31,24 +31,69 @@ export const EMPTY: Filters = {
     query: "",
 }
 
+/**
+ * Everything on the record, as one lowercase string.
+ *
+ * Search covers the whole application rather than a chosen few fields: someone
+ * looking for "hazel", "vimeo", a phone number, a scout's name or a word from
+ * what an applicant wrote should find it, and guessing which fields matter is
+ * how a search box ends up feeling broken.
+ */
+function haystack(a: ApplicationRow): string {
+    return [
+        a.name,
+        a.firstName,
+        a.lastName,
+        a.email,
+        a.phone,
+        a.dob,
+        String(a.age),
+        a.gender,
+        a.city,
+        a.country,
+        a.instagram,
+        String(a.height),
+        String(a.bust),
+        String(a.waist),
+        String(a.hips),
+        String(a.shoe),
+        a.hair,
+        a.eyes,
+        a.videoLink,
+        a.portfolioLink,
+        a.notes,
+        a.scout,
+        a.scoutCode,
+    ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+}
+
 export function applyFilters(rows: ApplicationRow[], f: Filters) {
-    const q = f.query.trim().toLowerCase()
-    return rows.filter(
-        (a) =>
-            a.height >= f.minHeight &&
-            a.age <= f.maxAge &&
-            a.age >= f.minAge &&
-            a.waist <= f.maxWaist &&
-            a.hips <= f.maxHips &&
-            (f.hair === "Any" ||
-                a.hair.toLowerCase().includes(f.hair.toLowerCase())) &&
-            (f.country === "Any" || a.country === f.country) &&
-            (!f.recent || a.applied <= 30) &&
-            (!q ||
-                a.name.toLowerCase().includes(q) ||
-                a.city.toLowerCase().includes(q) ||
-                a.email.toLowerCase().includes(q)),
-    )
+    // Every whitespace-separated term has to match somewhere, so "blonde
+    // berlin" narrows rather than widening.
+    const terms = f.query.trim().toLowerCase().split(/\s+/).filter(Boolean)
+
+    return rows.filter((a) => {
+        if (
+            a.height < f.minHeight ||
+            a.age > f.maxAge ||
+            a.age < f.minAge ||
+            a.waist > f.maxWaist ||
+            a.hips > f.maxHips ||
+            (f.hair !== "Any" &&
+                !a.hair.toLowerCase().includes(f.hair.toLowerCase())) ||
+            (f.country !== "Any" && a.country !== f.country) ||
+            (f.recent && a.applied > 30)
+        ) {
+            return false
+        }
+
+        if (terms.length === 0) return true
+        const hay = haystack(a)
+        return terms.every((t) => hay.includes(t))
+    })
 }
 
 /**
@@ -90,7 +135,7 @@ export function FilterColumn({
                 type="search"
                 value={value.query}
                 onChange={(e) => set("query", e.target.value)}
-                placeholder="Name, city or email"
+                placeholder="Search everything"
                 className="w-full border-b border-border bg-transparent py-1.5 text-xs outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-foreground/30"
             />
 

@@ -6,11 +6,11 @@ import { motion } from "framer-motion"
 import { Send } from "lucide-react"
 
 import {
-    ApplicationTable,
+    ApplicationGrid,
     SORTS,
     sortRows,
     type SortKey,
-} from "@/components/applications/application-table"
+} from "@/components/applications/application-card"
 import type { ApplicationRow } from "@/lib/applications"
 
 /**
@@ -107,7 +107,7 @@ export function ScoutQueue({ waiting }: { waiting: ApplicationRow[] }) {
                         </div>
                     </div>
 
-                    <ApplicationTable
+                    <ApplicationGrid
                         rows={rows}
                         selected={picked}
                         onToggle={toggle}

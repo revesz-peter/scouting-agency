@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation"
 import { ListPlus, Send } from "lucide-react"
 
 import {
-    ApplicationTable,
+    ApplicationGrid,
     SORTS,
     sortRows,
     type SortKey,
-} from "@/components/applications/application-table"
+} from "@/components/applications/application-card"
 import {
     applyFilters,
     EMPTY,
@@ -142,7 +142,7 @@ export function ApplicationsBoard({
                         too.
                     </p>
                 ) : (
-                    <ApplicationTable
+                    <ApplicationGrid
                         rows={matches}
                         selected={selected}
                         onToggle={toggle}

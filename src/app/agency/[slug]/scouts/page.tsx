@@ -69,7 +69,7 @@ export default async function AgencyScouts({
     ])
 
     return (
-        <div className="mx-auto w-full max-w-3xl">
+        <>
             <p className="text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
                 {membership.name}
             </p>
@@ -136,6 +136,6 @@ export default async function AgencyScouts({
                     ))}
                 </ul>
             </section>
-        </div>
+        </>
     )
 }

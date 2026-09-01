@@ -42,10 +42,10 @@ export function AppShell({
                 />
             </aside>
 
-            {/* No measure set here: a page of prose and a table of applicants
-                want different widths, so each page picks its own. */}
+            {/* One measure for every page, so moving between them does not
+                shift the column. Prose inside sets its own max-w-prose. */}
             <main className="min-w-0 flex-1 px-6 py-10 sm:px-10 lg:px-14 lg:py-14">
-                {children}
+                <div className="mx-auto w-full max-w-5xl">{children}</div>
             </main>
         </div>
     )
