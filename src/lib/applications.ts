@@ -63,24 +63,39 @@ const FIELDS = sql`
     s.code AS "scoutCode"
 `
 
+export interface InboxApplication extends ApplicationRow {
+    stage: string
+    /** Shortlisted: kept, but still one of the people you are working through. */
+    shortlisted: boolean
+}
+
 /**
- * The agency's Applied column: everything sent to them and not yet moved on.
- * An application a scout is still holding is deliberately absent — the agency
+ * The agency's working set: everything sent to them that has not gone past
+ * pre-select yet.
+ *
+ * Shortlisting keeps someone here rather than moving them out of sight. It is a
+ * mark on the pile you are already looking at — the pile is what you compare
+ * against, and a shortlist you cannot see beside the rest is not much of one.
+ * Scheduling a casting is the step that actually moves people on.
+ *
+ * An application a scout is still holding is deliberately absent: the agency
  * sees what the scout chose to pass on.
  */
 export async function agencyInbox(
     organizationId: string,
-): Promise<ApplicationRow[]> {
+): Promise<InboxApplication[]> {
     const rows = await sql`
-        SELECT ${FIELDS}
+        SELECT ${FIELDS},
+            a.stage,
+            a.stage = 'pre_select' AS shortlisted
         FROM public.application a
         LEFT JOIN public.scout_profile s ON s.id = a.scout_id
         WHERE a.organization_id = ${organizationId}
-          AND a.stage = 'applied'
+          AND a.stage IN ('applied', 'pre_select')
           AND a.sent_at IS NOT NULL
         ORDER BY a.created_at DESC
     `
-    return rows as ApplicationRow[]
+    return rows as InboxApplication[]
 }
 
 /** What a scout is still holding, oldest first — these are waiting on them. */

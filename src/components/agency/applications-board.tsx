@@ -16,7 +16,7 @@ import {
     FilterColumn,
     type Filters,
 } from "@/components/applications/filters"
-import type { ApplicationRow } from "@/lib/applications"
+import type { InboxApplication } from "@/lib/applications"
 
 /**
  * The agency's Applied column.
@@ -30,7 +30,7 @@ export function ApplicationsBoard({
     organizationId,
     slug,
 }: {
-    applications: ApplicationRow[]
+    applications: InboxApplication[]
     organizationId: string
     slug: string
 }) {
@@ -39,27 +39,44 @@ export function ApplicationsBoard({
     const [filters, setFilters] = useState<Filters>(DEFAULTS)
     const [sort, setSort] = useState<SortKey>("applied")
     const [picked, setPicked] = useState<string[]>([])
-    const [moved, setMoved] = useState(0)
+    const [show, setShow] = useState<"all" | "yes" | "no">("all")
+    const [moved, setMoved] = useState("")
     const [busy, setBusy] = useState(false)
     const [error, setError] = useState("")
 
-    const matches = useMemo(
-        () => sortRows(applyFilters(applications, filters), sort),
-        [applications, filters, sort],
-    )
+    const matches = useMemo(() => {
+        const byShortlist = applications.filter((a) =>
+            show === "all" ? true : show === "yes" ? a.shortlisted : !a.shortlisted,
+        )
+        return sortRows(
+            applyFilters(byShortlist, filters),
+            sort,
+        ) as InboxApplication[]
+    }, [applications, filters, sort, show])
 
     // Only ever act on people who still pass the filters.
     const selected = picked.filter((id) => matches.some((m) => m.id === id))
     const allSelected = selected.length === matches.length && matches.length > 0
 
     function toggle(id: string) {
-        setMoved(0)
+        setMoved("")
         setPicked((prev) =>
             prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
         )
     }
 
-    async function shortlist() {
+    /**
+     * Shortlisting moves between `applied` and `pre_select`, which is the same
+     * working set either way — so it reads as marking someone, and unmarking is
+     * the same button back.
+     */
+    async function setShortlist(on: boolean) {
+        const ids = selected.filter((id) => {
+            const row = applications.find((a) => a.id === id)
+            return row && row.shortlisted !== on
+        })
+        if (ids.length === 0) return
+
         setError("")
         setBusy(true)
 
@@ -69,19 +86,23 @@ export function ApplicationsBoard({
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     organizationId,
-                    ids: selected,
-                    stage: "pre_select",
+                    ids,
+                    stage: on ? "pre_select" : "applied",
                 }),
             })
 
             if (!response.ok) {
                 const body = await response.json().catch(() => ({}))
-                setError(body.error ?? "Couldn't move those.")
+                setError(body.error ?? "Couldn't update those.")
                 setBusy(false)
                 return
             }
 
-            setMoved(selected.length)
+            setMoved(
+                on
+                    ? `${ids.length} shortlisted`
+                    : `${ids.length} taken off the shortlist`,
+            )
             setPicked([])
             setBusy(false)
             router.refresh()
@@ -91,30 +112,61 @@ export function ApplicationsBoard({
         }
     }
 
+    const canAdd = selected.some(
+        (id) => !applications.find((a) => a.id === id)?.shortlisted,
+    )
+    const canRemove = selected.some(
+        (id) => applications.find((a) => a.id === id)?.shortlisted,
+    )
+    const shortlistedTotal = applications.filter((a) => a.shortlisted).length
+
     return (
         <div className="mt-8 grid gap-8 lg:grid-cols-[220px_1fr] lg:gap-10">
             <FilterColumn
                 rows={applications}
                 value={filters}
                 onChange={(f) => {
-                    setMoved(0)
+                    setMoved("")
                     setFilters(f)
                 }}
                 matches={matches.length}
                 allSelected={allSelected}
                 onSelectAll={() => {
-                    setMoved(0)
+                    setMoved("")
                     setPicked(allSelected ? [] : matches.map((m) => m.id))
                 }}
             />
 
             <div className="min-w-0">
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3">
-                    <p className="text-xs text-muted-foreground">
-                        {selected.length > 0
-                            ? `${selected.length} selected`
-                            : `${matches.length} shown`}
-                    </p>
+                    <div className="flex items-center gap-1.5">
+                        {(
+                            [
+                                ["all", `All ${applications.length}`],
+                                ["yes", `Shortlisted ${shortlistedTotal}`],
+                                ["no", "Not yet"],
+                            ] as const
+                        ).map(([key, label]) => (
+                            <button
+                                key={key}
+                                type="button"
+                                onClick={() => setShow(key)}
+                                aria-pressed={show === key}
+                                className={`border px-2 py-1 text-xs transition-colors ${
+                                    show === key
+                                        ? "border-foreground bg-foreground text-background"
+                                        : "border-border text-muted-foreground hover:border-foreground/30"
+                                }`}
+                            >
+                                {label}
+                            </button>
+                        ))}
+                        {selected.length > 0 && (
+                            <span className="ml-2 text-xs text-muted-foreground">
+                                {selected.length} selected
+                            </span>
+                        )}
+                    </div>
                     <div className="flex items-center gap-1.5">
                         <span className="text-xs uppercase tracking-[0.1em] text-muted-foreground">
                             Sort
@@ -150,25 +202,34 @@ export function ApplicationsBoard({
                         onToggle={toggle}
                         showScout
                         hrefFor={(id) => `/agency/${slug}/applications/${id}`}
+                        starredFor={(r) => (r as InboxApplication).shortlisted}
                     />
                 )}
 
                 <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-border pt-5">
                     <button
                         type="button"
-                        disabled={selected.length === 0 || busy}
-                        onClick={shortlist}
+                        disabled={!canAdd || busy}
+                        onClick={() => setShortlist(true)}
                         className="flex items-center gap-2 bg-foreground px-5 py-2.5 text-xs font-medium uppercase tracking-[0.15em] text-background transition-colors hover:bg-foreground/90 disabled:opacity-40"
                     >
                         <ListPlus className="h-3 w-3" />
-                        {busy
-                            ? "Moving…"
-                            : `Add ${selected.length || ""} to shortlist`}
+                        {busy ? "Working…" : "Shortlist"}
                     </button>
+                    {canRemove && (
+                        <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() => setShortlist(false)}
+                            className="border border-border px-4 py-2.5 text-xs font-medium uppercase tracking-[0.1em] text-foreground transition-colors hover:border-foreground/30 disabled:opacity-40"
+                        >
+                            Take off the shortlist
+                        </button>
+                    )}
                     <button
                         type="button"
                         disabled
-                        title="Castings are not built yet"
+                        title="Castings are not built yet — this is what the shortlist is for"
                         className="flex items-center gap-2 border border-border px-4 py-2.5 text-xs font-medium uppercase tracking-[0.1em] text-foreground disabled:opacity-40"
                     >
                         <Send className="h-3 w-3" />
@@ -176,13 +237,11 @@ export function ApplicationsBoard({
                     </button>
                     {error ? (
                         <p className="text-xs text-red-400">{error}</p>
-                    ) : moved > 0 ? (
-                        <p className="text-xs text-foreground">
-                            {moved} added · now in Pre-Select
-                        </p>
+                    ) : moved ? (
+                        <p className="text-xs text-foreground">{moved}</p>
                     ) : (
                         <p className="text-xs text-muted-foreground">
-                            Pick the ones worth keeping.
+                            Shortlisting keeps them here, marked.
                         </p>
                     )}
                 </div>

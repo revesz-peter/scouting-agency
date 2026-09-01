@@ -29,8 +29,9 @@ export default async function AgencyApplications({
             </h1>
             <p className="mt-4 max-w-prose text-xs leading-relaxed text-muted-foreground">
                 Set the bar and the board answers — height, age, measurements,
-                city, across every application you have received. What is worth
-                keeping goes to Pre-Select; the rest stays here.
+                city, across every application you have received. Shortlisting
+                marks the ones worth keeping without taking them out of the
+                pile; scheduling a casting is what moves them on.
             </p>
 
             <ApplicationsBoard

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Check } from "lucide-react"
+import { Check, Star } from "lucide-react"
 
 import type { ApplicationRow } from "@/lib/applications"
 
@@ -41,6 +41,7 @@ export function ApplicationCard({
     showScout,
     href,
     badge,
+    starred,
     selectable = true,
 }: {
     row: ApplicationRow
@@ -51,6 +52,8 @@ export function ApplicationCard({
     href?: string
     /** Where they got to — what a scout wants to know about someone they sent. */
     badge?: string
+    /** Kept, and still sitting with everyone else. */
+    starred?: boolean
     /** Some lists are for reading, not picking. */
     selectable?: boolean
 }) {
@@ -60,6 +63,12 @@ export function ApplicationCard({
                 selected ? "border-foreground" : "border-border"
             }`}
         >
+            {starred && (
+                <span className="mb-1 flex items-center gap-1 text-[10px] uppercase tracking-[0.1em] text-foreground">
+                    <Star className="h-2.5 w-2.5 fill-foreground" strokeWidth={0} />
+                    Shortlisted
+                </span>
+            )}
             <button
                 type="button"
                 onClick={onSelect}
@@ -166,6 +175,7 @@ export function ApplicationGrid({
     showScout,
     hrefFor,
     badgeFor,
+    starredFor,
     selectable = true,
 }: {
     rows: ApplicationRow[]
@@ -174,6 +184,7 @@ export function ApplicationGrid({
     showScout?: boolean
     hrefFor?: (id: string) => string
     badgeFor?: (row: ApplicationRow) => string | undefined
+    starredFor?: (row: ApplicationRow) => boolean
     selectable?: boolean
 }) {
     return rows.length === 0 ? null : (
@@ -187,6 +198,7 @@ export function ApplicationGrid({
                     showScout={showScout}
                     href={hrefFor?.(r.id)}
                     badge={badgeFor?.(r)}
+                    starred={starredFor?.(r)}
                     selectable={selectable}
                 />
             ))}
