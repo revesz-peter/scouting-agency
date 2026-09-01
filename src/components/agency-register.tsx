@@ -83,8 +83,10 @@ export function AgencyRegisterForm() {
                 </h1>
                 <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
                     Tell us about the agency and pick a password. We email a
-                    six-digit code to confirm the address, and your apply link
-                    works the moment you&apos;re in.
+                    six-digit code to confirm the address, and your workspace
+                    opens straight away. Your apply and scout links go live once
+                    we have checked the agency — applicants need to know who
+                    they are sending their photos to.
                 </p>
 
                 <form
@@ -197,14 +199,8 @@ export function AgencyRegisterForm() {
                             autoComplete="new-password"
                             aria-required="true"
                         />
-                        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-                            At least {MIN_PASSWORD} characters. We email a
-                            six-digit code to your work address and you cannot
-                            get in without it. We then check the agency by hand
-                            before your links go live — applicants need to know
-                            who they are sending their photos to. Use an address
-                            at the agency&apos;s own domain if you have one; it
-                            makes that check quick.
+                        <p className="mt-1.5 text-xs text-muted-foreground">
+                            At least {MIN_PASSWORD} characters.
                         </p>
                     </Field>
 

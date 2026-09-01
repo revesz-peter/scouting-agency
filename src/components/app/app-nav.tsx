@@ -89,45 +89,21 @@ export function AppNav({
                     <WorkspaceSwitcher workspaces={workspaces} current={current} />
                 )}
 
-                {link && (
-                    <div>
-                        <p className="text-xs font-medium uppercase tracking-[0.15em] text-muted-foreground/70">
-                            {link.label}
-                        </p>
-                        <div className="mt-1 flex items-center gap-1.5">
-                            {/* Short form: the host is the same for everyone and
-                                would only crowd a narrow column. Copying still
-                                gives the whole URL. */}
-                            <span
-                                className={`min-w-0 truncate text-sm ${
-                                    link.live === false
-                                        ? "text-muted-foreground/50 line-through"
-                                        : "text-foreground"
-                                }`}
-                            >
-                                {link.path}
-                            </span>
-                            {link.live !== false && (
-                                <CopyButton
-                                    value={siteUrl(link.path)}
-                                    label={`Copy ${link.label.toLowerCase()}`}
-                                />
-                            )}
-                        </div>
-                        {link.live === false && (
-                            <p className="mt-1 text-xs text-muted-foreground/70">
-                                Not live yet
-                            </p>
-                        )}
-                    </div>
-                )}
-
                 <nav className="space-y-7">
                     {sections.map((section) => (
-                        <div key={section.title}>
-                            <p className="mb-2.5 text-xs font-medium uppercase tracking-[0.15em] text-muted-foreground/70">
-                                {section.title}
-                            </p>
+                        <div
+                            key={section.title || "unlabelled"}
+                            // An untitled block sits apart under a rule, for the
+                            // things you reach for occasionally.
+                            className={
+                                section.title ? "" : "border-t border-border pt-6"
+                            }
+                        >
+                            {section.title && (
+                                <p className="mb-2.5 text-xs font-medium uppercase tracking-[0.15em] text-muted-foreground/70">
+                                    {section.title}
+                                </p>
+                            )}
                             <ul className="space-y-1.5">
                                 {section.items.map((item) => {
                                     if (!item.href) {
@@ -174,17 +150,56 @@ export function AppNav({
                 </nav>
             </div>
 
-            <div className="hidden border-t border-border pt-5 lg:block">
-                <p className="truncate text-xs text-muted-foreground" title={email}>
-                    {email}
-                </p>
-                <button
-                    onClick={signOut}
-                    disabled={busy}
-                    className="mt-2 text-xs uppercase tracking-[0.1em] text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground disabled:opacity-40"
-                >
-                    {busy ? "Signing out…" : "Sign out"}
-                </button>
+            {/* The link you hand out is a reference, not somewhere you navigate
+                to, so it sits down here with the account rather than above the
+                nav. One group, so `justify-between` keeps nav up and these
+                down instead of spreading three blocks evenly. */}
+            <div className="space-y-5">
+                {link && (
+                <div className="border-t border-border pt-5">
+                    <p className="text-xs font-medium uppercase tracking-[0.15em] text-muted-foreground/70">
+                        {link.label}
+                    </p>
+                    <div className="mt-1 flex items-center gap-1.5">
+                        {/* Short form: the host is the same for everyone and
+                            would only crowd a narrow column. Copying still
+                            gives the whole URL. */}
+                        <span
+                            className={`min-w-0 truncate text-sm ${
+                                link.live === false
+                                    ? "text-muted-foreground/50 line-through"
+                                    : "text-foreground"
+                            }`}
+                        >
+                            {link.path}
+                        </span>
+                        {link.live !== false && (
+                            <CopyButton
+                                value={siteUrl(link.path)}
+                                label={`Copy ${link.label.toLowerCase()}`}
+                            />
+                        )}
+                    </div>
+                    {link.live === false && (
+                        <p className="mt-1 text-xs text-muted-foreground/70">
+                            Not live yet
+                        </p>
+                    )}
+                </div>
+                )}
+
+                <div className="hidden border-t border-border pt-5 lg:block">
+                    <p className="truncate text-xs text-muted-foreground" title={email}>
+                        {email}
+                    </p>
+                    <button
+                        onClick={signOut}
+                        disabled={busy}
+                        className="mt-2 text-xs uppercase tracking-[0.1em] text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground disabled:opacity-40"
+                    >
+                        {busy ? "Signing out…" : "Sign out"}
+                    </button>
+                </div>
             </div>
         </div>
     )

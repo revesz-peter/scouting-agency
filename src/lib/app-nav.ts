@@ -25,7 +25,6 @@ export function agencySections(slug: string, admin = false): NavSection[] {
             items: [
                 { label: "The board" },
                 { label: "Scouts", href: `/agency/${slug}/scouts` },
-                { label: "Settings", href: `/agency/${slug}/settings` },
             ],
         },
     ]
@@ -38,6 +37,13 @@ export function agencySections(slug: string, admin = false): NavSection[] {
             items: [{ label: "Agencies", href: "/admin" }],
         })
     }
+
+    // Untitled and last: settings is somewhere you go occasionally, not part of
+    // the daily run through the pipeline.
+    sections.push({
+        title: "",
+        items: [{ label: "Settings", href: `/agency/${slug}/settings` }],
+    })
 
     return sections
 }
